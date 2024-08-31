@@ -16,7 +16,11 @@ const AuthStackScreen = () => (
     initialRouteName="Login"
     screenOptions={{headerShown: false}}>
     <AuthStack.Screen name="Login" component={LoginScreen} />
-    <AuthStack.Screen name="Register" component={RegisterScreen} />
+    <AuthStack.Screen
+      name="Register"
+      component={RegisterScreen}
+      options={{headerShown: true}}
+    />
   </AuthStack.Navigator>
 );
 

@@ -33,6 +33,7 @@ const screenSize = Dimensions.get('window');
 
 const Login = ({navigation}: {navigation: NavigationProp<any>}) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [failedLogin, setFailedLogin] = useState('');
   const [password, setPassword] = useState('');
   const [isChecked, setIsChecked] = useState(false);
   const [username, setUsername] = useState('');
@@ -72,6 +73,28 @@ const Login = ({navigation}: {navigation: NavigationProp<any>}) => {
   //     setIsLoading(false);
   //   }, 1000);
   // }, []);
+
+  const DisplayFailedLogin = ({text}: {text: string}) => {
+    const displayText = text ? text : 'Unexpected error occurred';
+    return (
+      <View
+        style={{
+          marginTop: 10,
+          alignContent: 'center',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Text
+          style={{
+            fontSize: 14,
+            fontFamily: 'Poppins-LightItalic',
+            color: 'red',
+          }}>
+          {displayText}
+        </Text>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -115,7 +138,6 @@ const Login = ({navigation}: {navigation: NavigationProp<any>}) => {
                     height: 24,
                     width: 24,
                     zIndex: 1,
-                    backgroundColor: '#D9D9D9',
                   }} // Set background color
                   fill={'#918B76'} // Set icon color
                 />
@@ -198,6 +220,9 @@ const Login = ({navigation}: {navigation: NavigationProp<any>}) => {
             </TouchableOpacity>
           </View>
 
+          {/* Failed login */}
+          {!failedLogin && <DisplayFailedLogin text={failedLogin} />}
+
           {/* "Or login with" text */}
           <View
             style={{
@@ -254,7 +279,7 @@ const Login = ({navigation}: {navigation: NavigationProp<any>}) => {
                 alignItems: 'center',
                 borderRadius: 10,
                 flexDirection: 'row',
-                marginTop: 20,
+                marginTop: 15,
               }}>
               <Google style={{height: 24, width: 24, marginRight: 10}} />
               <Text
@@ -348,6 +373,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     backgroundColor: '#D9D9D9',
+    color: '#00171F',
     height: 50,
     width: screenSize.width - 60,
     marginHorizontal: 20,
