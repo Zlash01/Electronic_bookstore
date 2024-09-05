@@ -18,9 +18,9 @@ import {
 import CheckBox from '@react-native-community/checkbox';
 import React, {useCallback, useState, useMemo, useEffect} from 'react';
 import {NavigationProp} from '@react-navigation/native';
+import Loading from '../loading/loading';
 
 // SVG imports
-import Loading from '../loading/loading';
 import Logo from '../../assets/svg/auth/LogoOnlyNoBackgroundDark.svg';
 import Email from '../../assets/svg/auth/email.svg';
 import Password from '../../assets/svg/auth/password.svg';
@@ -134,22 +134,11 @@ const Login = ({navigation}: {navigation: NavigationProp<any>}) => {
               onPress={togglePasswordVisibility}>
               {isPasswordVisible ? (
                 <VisabilityOff
-                  style={{
-                    height: 24,
-                    width: 24,
-                    zIndex: 1,
-                  }} // Set background color
-                  fill={'#918B76'} // Set icon color
+                  style={styles.vis as StyleProp<TextStyle>} // Set background colors
                 />
               ) : (
                 <Visability
-                  style={{
-                    height: 24,
-                    width: 24,
-                    zIndex: 1,
-                    backgroundColor: '#D9D9D9',
-                  }}
-                  fill={'#918B76'}
+                  style={styles.vis as StyleProp<TextStyle>} // Set background colors
                 />
               )}
             </TouchableOpacity>
@@ -392,5 +381,11 @@ const styles = StyleSheet.create({
     left: 40,
     color: '#918B76',
     zIndex: 1,
+  },
+  vis: {
+    width: 24,
+    height: 24,
+    zIndex: 1,
+    color: '#918B76',
   },
 });
