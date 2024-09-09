@@ -9,8 +9,8 @@ const Navigation = () => {
   return (
     <NavigationContainer>
       {/* {isAuthenticated ? <MainStackScreen /> : <AuthStackScreen />} */}
-      <AuthStackScreen />
-      {/* <BottomTabBar /> */}
+      {/* <AuthStackScreen /> */}
+      <BottomTabBar />
     </NavigationContainer>
   );
 };
