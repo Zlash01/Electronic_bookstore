@@ -37,6 +37,10 @@ const BigStoryCard = (props: {
     return limitedText;
   }
 
+    const limitedText = truncateAtWordBoundary(text, limit);
+    return limitedText;
+  }
+
   const limitedTitle = limit(title, 35);
   const limitedDescription = limit(description, 150);
 
