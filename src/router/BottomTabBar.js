@@ -38,19 +38,35 @@ function BottomTabBar() {
           if (route.name === 'Home') {
             iconName = (
               <HomeIcon
-                color={focused ? 'white' : 'red'}
+                color={focused ? '#EB5E28' : '#AAA'}
                 width={size}
                 height={size}
               />
             );
           } else if (route.name === 'Library') {
             iconName = (
-              <LibraryIcon style={{color: focused ? 'white' : 'red'}} />
+              <LibraryIcon
+                color={focused ? '#EB5E28' : '#AAA'}
+                width={size}
+                height={size}
+              />
             );
           } else if (route.name === 'Write') {
-            iconName = <WriteIcon style={IconStyle.icon} />;
+            iconName = (
+              <WriteIcon
+                color={focused ? '#EB5E28' : '#AAA'}
+                width={size}
+                height={size}
+              />
+            );
           } else if (route.name === 'Profile') {
-            iconName = <ProfileIcon style={IconStyle.icon} />;
+            iconName = (
+              <ProfileIcon
+                color={focused ? '#EB5E28' : '#AAA'}
+                width={size}
+                height={size}
+              />
+            );
           }
           return iconName;
         },
@@ -64,7 +80,3 @@ function BottomTabBar() {
 }
 
 export default BottomTabBar;
-
-const IconStyle = StyleSheet.create({
-  icon: {},
-});
