@@ -3,7 +3,7 @@ import React from 'react';
 import Auth from './src/component/auth/Login';
 import {NavigationContainer} from '@react-navigation/native';
 import AuthStackScreen from './src/router/index.js';
-import BigStoryCard from './src/component/home/BigStoryCard.tsx';
+import BigStoryCard from './src/component/home/Util/BigStoryCard.tsx';
 import Navigation from './src/router/index.js';
 
 const App = () => {

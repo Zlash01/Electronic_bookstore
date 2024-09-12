@@ -1,6 +1,5 @@
 import React from 'react';
 import {Dimensions, StyleSheet} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
 import Home from '../component/home/Home.tsx';
@@ -73,8 +72,8 @@ function BottomTabBar() {
       })}>
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Library" component={LibraryScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
       <Tab.Screen name="Write" component={WriteScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
 }
