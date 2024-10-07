@@ -14,6 +14,7 @@ import {
   TextInput,
   TouchableOpacity,
   Switch,
+  Alert,
 } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import React, {useCallback, useState, useMemo, useEffect} from 'react';
@@ -28,6 +29,7 @@ import Facebook from '../../assets/svg/auth/Facebook.svg';
 import Google from '../../assets/svg/auth/google.svg';
 import Visability from '../../assets/svg/auth/visibility.svg';
 import VisabilityOff from '../../assets/svg/auth/visibility_off.svg';
+import {registerRequest} from '../../api/apiController';
 
 const screenSize = Dimensions.get('window');
 
@@ -49,6 +51,7 @@ const Register = ({navigation}: {navigation: NavigationProp<any>}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [failedRegister, setFailedRegister] = useState('');
 
@@ -60,12 +63,49 @@ const Register = ({navigation}: {navigation: NavigationProp<any>}) => {
 
   const handleRegister = () => {
     console.log('Username: ', username);
+    console.log('Email: ', email);
     console.log('Password: ', password);
     console.log('Confirm Password: ', confirmPassword);
+    //check if any field is empty
+    if (!username || !email || !password || !confirmPassword) {
+      setFailedRegister('Please fill all fields');
+      return;
+    }
     if (password !== confirmPassword) {
       setFailedRegister('Passwords do not match');
       return;
     }
+    //check if email is valid
+    if (!email.includes('@') || !email.includes('.')) {
+      setFailedRegister('Invalid email');
+      return;
+    }
+
+    setIsLoading(true);
+    //call register api
+    registerRequest(email, username, password)
+      .then(response => {
+        if (response.status === 201) {
+          Alert.alert('Registration successful', 'Please login to continue', [
+            {
+              text: 'OK',
+              onPress: () => {
+                navigation.navigate('Login');
+              },
+            },
+          ]);
+        }
+      })
+      .catch(error => {
+        if (error.response) {
+          setFailedRegister(error.response.data.message);
+        } else {
+          setFailedRegister('Unexpected error occurred');
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const handleGoogleRegister = () => {
@@ -102,13 +142,6 @@ const Register = ({navigation}: {navigation: NavigationProp<any>}) => {
     );
   };
 
-  // useEffect(() => {
-  //   setIsLoading(true);
-  //   setTimeout(() => {
-  //     setIsLoading(false);
-  //   }, 1000);
-  // }, []);
-
   const displayFailedLogin = () => {
     console.log('Login failed');
   };
@@ -129,7 +162,16 @@ const Register = ({navigation}: {navigation: NavigationProp<any>}) => {
           <View style={styles.inputContainer}>
             <Email style={styles.inputIcon} />
             <TextInput
-              placeholder="Email or Username"
+              placeholder="Email"
+              placeholderTextColor={'#918B76'}
+              value={email}
+              onChangeText={text => setEmail(text)}
+              style={styles.textInput}></TextInput>
+          </View>
+          <View style={styles.inputContainer}>
+            <Email style={styles.inputIcon} />
+            <TextInput
+              placeholder="Username"
               placeholderTextColor={'#918B76'}
               value={username}
               onChangeText={text => setUsername(text)}

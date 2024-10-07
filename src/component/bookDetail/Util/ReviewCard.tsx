@@ -22,10 +22,10 @@ const ReviewCard = (props: {
     <View
       style={{
         width: '100%',
-        backgroundColor: '#0A1C90',
+        backgroundColor: '#00171F',
         borderRadius: 12,
         overflow: 'hidden',
-        shadowColor: '#000',
+        shadowColor: '#fff',
         shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.22,
         shadowRadius: 2.22,
@@ -37,7 +37,7 @@ const ReviewCard = (props: {
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          backgroundColor: '#FC7C1C',
+          backgroundColor: '#4e4e4e',
 
           paddingVertical: 10,
         }}>
@@ -115,7 +115,7 @@ const ReviewCard = (props: {
                 paddingHorizontal: 10,
                 fontFamily: 'Poppins-SemiBold',
                 fontSize: 14,
-                color: '#FC7C1C',
+                color: '#D24E37',
                 alignSelf: 'flex-end',
               }}>
               {expanded ? 'Show Less' : 'Show More'}

@@ -8,9 +8,9 @@ import BookDetail from './src/component/bookDetail/BookDetail.tsx';
 import IndividualChapter from './src/component/bookDetail/Util/IndividualChapter.tsx';
 import ReviewCard from './src/component/bookDetail/Util/ReviewCard.tsx';
 
-// const App = () => {
-//   return <Navigation />;
-// };
+const App = () => {
+  return <Navigation />;
+};
 
 // const App = () => {
 //   return <AuthStackScreen />;
@@ -72,9 +72,9 @@ import ReviewCard from './src/component/bookDetail/Util/ReviewCard.tsx';
 //   return <ContinueCard data={continueData} />;
 // };
 
-const App = () => {
-  return <BookDetail idBooks={1} />;
-};
+// const App = () => {
+//   return <BookDetail idBooks={1} />;
+// };
 
 // const App = () => {
 //   return (

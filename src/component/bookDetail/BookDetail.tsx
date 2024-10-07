@@ -6,6 +6,7 @@ import {
   Touchable,
   TouchableOpacity,
   ScrollView,
+  FlatList,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -146,7 +147,7 @@ const similarStories = [
   {
     idBooks: 2,
     imageLink: 'https://i.postimg.cc/8ckPPDky/image-1.png',
-    title: 'Similar Book 2',
+    title: 'Similar Book 2 long text bla bla bla',
   },
   {
     idBooks: 3,
@@ -324,32 +325,39 @@ const bookDetail = (props: {idBooks: any}) => {
   };
 
   const SimilarStories = () => {
-    return similarStories.map((story, index) => (
-      <View
-        key={index}
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: 10,
-          backgroundColor: '#011D27',
-          marginBottom: 10,
-        }}>
-        <Image
-          source={{uri: story.imageLink}}
-          style={{height: 60, width: 40}}
-          resizeMode="contain"
-        />
-        <Text
-          style={{
-            color: '#D2CEDC',
-            fontSize: 16,
-            fontFamily: 'Poppins-Regular',
-          }}>
-          {story.title}
-        </Text>
-      </View>
-    ));
+    return (
+      <FlatList
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{gap: width * 0.03}}
+        data={similarStories}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({item}) => (
+          <TouchableOpacity
+            style={{
+              alignItems: 'center',
+            }}>
+            <Image
+              source={{uri: item.imageLink}}
+              style={{
+                height: height * 0.15,
+                width: width * 0.24,
+              }}
+              resizeMode="contain"
+            />
+            <Text
+              style={{
+                color: '#D2CEDC',
+                fontSize: 14,
+                fontFamily: 'Poppins-Regular',
+                width: width * 0.24,
+              }}>
+              {item.title}
+            </Text>
+          </TouchableOpacity>
+        )}
+      />
+    );
   };
 
   return (
@@ -617,7 +625,26 @@ const bookDetail = (props: {idBooks: any}) => {
           </View>
         </View>
         {/* similar stories */}
-        <View>
+        <View
+          style={{
+            backgroundColor: '#00171F',
+            paddingHorizontal: width * 0.02,
+            paddingVertical: height * 0.02,
+          }}>
+          <View
+            style={{
+              marginBottom: 15,
+            }}>
+            <Text
+              style={{
+                fontFamily: 'Poppins-SemiBold',
+                fontSize: 20,
+                color: '#D2CEDC',
+              }}>
+              SIMILAR STORIES
+            </Text>
+          </View>
+
           <SimilarStories />
         </View>
       </ScrollView>

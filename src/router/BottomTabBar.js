@@ -1,6 +1,7 @@
 import React from 'react';
-import {Dimensions, StyleSheet} from 'react-native';
+import {Dimensions} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {NavigationContainer} from '@react-navigation/native';
 
 import Home from '../component/home/Home.tsx';
 import Library from '../component/library/Library.tsx';
@@ -22,7 +23,7 @@ const Tab = createBottomTabNavigator();
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
 
-function BottomTabBar() {
+function Main() {
   return (
     <Tab.Navigator
       initialRouteName={'Home'}
@@ -32,7 +33,7 @@ function BottomTabBar() {
           height: HEIGHT * 0.07,
           backgroundColor: 'black',
         },
-        tabBarIcon: ({focused, size, color}) => {
+        tabBarIcon: ({focused, size = 24, color = '#AAA'}) => {
           let iconName;
           if (route.name === 'Home') {
             iconName = (
@@ -78,4 +79,4 @@ function BottomTabBar() {
   );
 }
 
-export default BottomTabBar;
+export default Main;

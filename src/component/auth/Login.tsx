@@ -19,6 +19,8 @@ import CheckBox from '@react-native-community/checkbox';
 import React, {useCallback, useState, useMemo, useEffect} from 'react';
 import {NavigationProp} from '@react-navigation/native';
 import Loading from '../loading/loading';
+import {loginRequest} from '../../api/apiController';
+import {useAuthStore} from '../../store/Store';
 
 // SVG imports
 import Logo from '../../assets/svg/auth/LogoOnlyNoBackgroundDark.svg';
@@ -28,6 +30,7 @@ import Facebook from '../../assets/svg/auth/Facebook.svg';
 import Google from '../../assets/svg/auth/google.svg';
 import Visability from '../../assets/svg/auth/visibility.svg';
 import VisabilityOff from '../../assets/svg/auth/visibility_off.svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const screenSize = Dimensions.get('window');
 
@@ -37,11 +40,29 @@ const Login = ({navigation}: {navigation: NavigationProp<any>}) => {
   const [password, setPassword] = useState('');
   const [isChecked, setIsChecked] = useState(false);
   const [username, setUsername] = useState('');
-
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const {login} = useAuthStore.getState() as {
+    login: (userData: any, accessToken: string, refreshToken: string) => void;
+  };
 
   const togglePasswordVisibility = useCallback(() => {
     setIsPasswordVisible(prevState => !prevState);
+  }, []);
+
+  useEffect(() => {
+    // Check if username and password are saved in local storage
+    AsyncStorage.getItem('username').then(value => {
+      if (value) {
+        setUsername(value);
+      }
+    });
+
+    AsyncStorage.getItem('password').then(value => {
+      if (value) {
+        setPassword(value);
+        setIsChecked(true);
+      }
+    });
   }, []);
 
   const handleLogin = () => {
@@ -49,6 +70,53 @@ const Login = ({navigation}: {navigation: NavigationProp<any>}) => {
     console.log('Username: ', username);
     console.log('Password: ', password);
     console.log('Remember Password: ', isChecked);
+
+    // Check if username and password are empty
+    if (username === '' || password === '') {
+      setFailedLogin('Username and Password cannot be empty');
+      return;
+    }
+
+    setIsLoading(true);
+    loginRequest(username, password)
+      .then(response => {
+        console.log('Response: ', response);
+        console.log('Response status: ', response?.status);
+        if (response && response.status === 201) {
+          console.log('Login successful');
+          setFailedLogin('');
+
+          //save remember password and username to local storage
+          console.log('Save username to local storage');
+          AsyncStorage.setItem('username', username);
+          console.log('Save refresh token to local storage');
+          AsyncStorage.setItem('refreshToken', response.data.refresh_token);
+          if (isChecked) {
+            console.log('Save password to local storage');
+            AsyncStorage.setItem('password', password);
+          } else {
+            console.log('Remove password from local storage');
+            AsyncStorage.removeItem('password');
+          }
+
+          //save user data to store
+          login(
+            response.data.userProfile,
+            response.data.access_token,
+            response.data.refresh_token,
+          );
+        }
+      })
+      .catch(error => {
+        if (error && error.response && error.response.status === 404) {
+          setFailedLogin('Invalid username or password');
+        } else {
+          setFailedLogin('Unexpected error occurred');
+        }
+      })
+      .finally(() => {
+        setIsLoading(false); // Set loading to false in both success and failure cases
+      });
   };
 
   const handleGoogleLogin = () => {
@@ -66,13 +134,6 @@ const Login = ({navigation}: {navigation: NavigationProp<any>}) => {
   const handleRegister = () => {
     navigation.navigate('Register');
   };
-
-  // useEffect(() => {
-  //   setIsLoading(true);
-  //   setTimeout(() => {
-  //     setIsLoading(false);
-  //   }, 1000);
-  // }, []);
 
   const DisplayFailedLogin = ({text}: {text: string}) => {
     const displayText = text ? text : 'Unexpected error occurred';
@@ -103,7 +164,7 @@ const Login = ({navigation}: {navigation: NavigationProp<any>}) => {
           <View style={styles.logoContainer}>
             <Logo style={styles.logo as StyleProp<TextStyle>} />
             <View style={styles.textContainer}>
-              <Text style={styles.title}>Electronic</Text>
+              <Text style={[styles.title, {}]}>Electronic</Text>
               <Text style={styles.title}>Bookstore</Text>
             </View>
           </View>
@@ -210,7 +271,7 @@ const Login = ({navigation}: {navigation: NavigationProp<any>}) => {
           </View>
 
           {/* Failed login */}
-          {!failedLogin && <DisplayFailedLogin text={failedLogin} />}
+          {failedLogin && <DisplayFailedLogin text={failedLogin} />}
 
           {/* "Or login with" text */}
           <View
@@ -297,7 +358,7 @@ const Login = ({navigation}: {navigation: NavigationProp<any>}) => {
                 fontFamily: 'Poppins-Light',
                 fontSize: 13,
               }}>
-              Dont have an Account?
+              Don't have an Account?
             </Text>
             <TouchableOpacity onPress={handleRegister}>
               <Text
@@ -330,15 +391,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     marginTop: 100,
+    marginBottom: 18,
   },
   textContainer: {
     marginLeft: 10,
     flexDirection: 'column',
+
+    alignContent: 'flex-end',
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     color: '#FAFFFD',
-    fontFamily: 'Poppins-SemiBold',
+    fontFamily: 'Poppins-Bold',
   },
   logo: {
     color: '#FAFFFD' as ColorValue,

@@ -1,18 +1,42 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
-import BottomTabBar from './BottomTabBar.js';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {RefreshRequest} from '../api/apiController.js';
 import AuthStackScreen from './Authencation.js';
-import BookDetail from '../component/bookDetail/BookDetail.tsx';
+import {useAuthStore} from '../store/Store.js';
+import Main from './BottomTabBar.js';
 
 const Navigation = () => {
-  const [isAuthenticated, setIsAuthenticated] = React.useState(false);
+  const {isLogin} = useAuthStore();
+  const {login} = useAuthStore.getState();
+
+  useEffect(() => {
+    // check if user is authenticated
+    AsyncStorage.getItem('refreshToken').then(token => {
+      if (token) {
+        RefreshRequest(token).then(response => {
+          if (response.status === 201) {
+            console.log('Token refreshed');
+            login(
+              response.data,
+              response.data.accessToken,
+              response.data.refreshToken,
+            );
+            AsyncStorage.setItem('refreshToken', response.data.refreshToken);
+          } else {
+            console.log('error', response);
+          }
+        });
+      } else {
+        console.log('refreshToken is null');
+      }
+    });
+  }, []);
 
   return (
     <NavigationContainer>
-      {/* {isAuthenticated ? <MainStackScreen /> : <AuthStackScreen />} */}
-      {/* <AuthStackScreen /> */}
-      {/* <BottomTabBar /> */}
-      <BookDetail />
+      {isLogin ? <Main /> : <AuthStackScreen />}
     </NavigationContainer>
   );
 };
