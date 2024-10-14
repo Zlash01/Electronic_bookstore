@@ -15,11 +15,11 @@ import Loading from '../loading/loading';
 import IndividualChapter from './Util/IndividualChapter';
 
 //svg icons
-import Vis from '../../assets/svg/home/visibility.svg';
-import Star from '../../assets/svg/home/star.svg';
-import TOC from '../../assets/svg/home/toc.svg';
-import Lib from '../../assets/svg/home/library.svg';
-import LibAdd from '../../assets/svg/home/library_add.svg';
+import Vis from '../../assets/svg/bookDetail/visibility.svg';
+import Star from '../../assets/svg/bookDetail/star.svg';
+import TOC from '../../assets/svg/bookDetail/toc.svg';
+import Lib from '../../assets/svg/bookDetail/library.svg';
+import LibAdd from '../../assets/svg/bookDetail/library_add.svg';
 import limit from '../../util/limitWord';
 import ReviewCard from './Util/ReviewCard';
 
@@ -169,7 +169,7 @@ const similarStories = [
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
-const bookDetail = (props: {idBooks: any}) => {
+const BookDetail = (props: {idBooks: any}) => {
   // get book detail from api
   const bookDetail = dummyData;
 
@@ -652,4 +652,4 @@ const bookDetail = (props: {idBooks: any}) => {
   );
 };
 
-export default bookDetail;
+export default BookDetail;

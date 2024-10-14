@@ -90,7 +90,7 @@ const Login = ({navigation}: {navigation: NavigationProp<any>}) => {
           console.log('Save username to local storage');
           AsyncStorage.setItem('username', username);
           console.log('Save refresh token to local storage');
-          AsyncStorage.setItem('refreshToken', response.data.refresh_token);
+          AsyncStorage.setItem('refreshToken', response.data.refreshToken);
           if (isChecked) {
             console.log('Save password to local storage');
             AsyncStorage.setItem('password', password);
@@ -102,8 +102,8 @@ const Login = ({navigation}: {navigation: NavigationProp<any>}) => {
           //save user data to store
           login(
             response.data.userProfile,
-            response.data.access_token,
-            response.data.refresh_token,
+            response.data.accessToken,
+            response.data.refreshToken,
           );
         }
       })

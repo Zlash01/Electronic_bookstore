@@ -3,10 +3,11 @@ import {Dimensions} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
 
-import Home from '../component/home/Home.tsx';
+import Home from '../component/home/Home.js';
 import Library from '../component/library/Library.tsx';
 import Write from '../component/write/Write.tsx';
 import Profile from '../component/profile/Profile.tsx';
+// import HomeStackNavigator from './Home.js';
 
 import HomeIcon from '../assets/svg/bottomTabBar/home.svg';
 import LibraryIcon from '../assets/svg/bottomTabBar/library.svg';
@@ -71,7 +72,11 @@ function Main() {
           return iconName;
         },
       })}>
-      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{headerShown: false}}
+      />
       <Tab.Screen name="Library" component={LibraryScreen} />
       <Tab.Screen name="Write" component={WriteScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
