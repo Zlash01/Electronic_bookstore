@@ -11,7 +11,6 @@ import {
 import React, {useEffect, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Image} from 'react-native';
-import Loading from '../loading/loading';
 import IndividualChapter from './Util/IndividualChapter';
 
 //svg icons

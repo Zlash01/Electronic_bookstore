@@ -4,10 +4,11 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
 
 import Home from '../component/home/Home.js';
-import Library from '../component/library/Library.tsx';
+import Library from '../component/library/Library.js';
 import Write from '../component/write/Write.tsx';
 import Profile from '../component/profile/Profile.tsx';
-// import HomeStackNavigator from './Home.js';
+import HomeStackNavigator from './Home.js';
+import LibraryStackNavigator from './Library.js';
 
 import HomeIcon from '../assets/svg/bottomTabBar/home.svg';
 import LibraryIcon from '../assets/svg/bottomTabBar/library.svg';
@@ -27,7 +28,7 @@ const HEIGHT = Dimensions.get('window').height;
 function Main() {
   return (
     <Tab.Navigator
-      initialRouteName={'Home'}
+      initialRouteName={'HomeStack'}
       screenOptions={({route}) => ({
         tabBarShowLabel: false,
         tabBarStyle: {
@@ -36,7 +37,7 @@ function Main() {
         },
         tabBarIcon: ({focused, size = 24, color = '#AAA'}) => {
           let iconName;
-          if (route.name === 'Home') {
+          if (route.name === 'HomeStack') {
             iconName = (
               <HomeIcon
                 color={focused ? '#EB5E28' : '#AAA'}
@@ -44,7 +45,7 @@ function Main() {
                 height={size}
               />
             );
-          } else if (route.name === 'Library') {
+          } else if (route.name === 'LibraryStack') {
             iconName = (
               <LibraryIcon
                 color={focused ? '#EB5E28' : '#AAA'}
@@ -52,7 +53,7 @@ function Main() {
                 height={size}
               />
             );
-          } else if (route.name === 'Write') {
+          } else if (route.name === 'WriteStack') {
             iconName = (
               <WriteIcon
                 color={focused ? '#EB5E28' : '#AAA'}
@@ -60,7 +61,7 @@ function Main() {
                 height={size}
               />
             );
-          } else if (route.name === 'Profile') {
+          } else if (route.name === 'ProfileStack') {
             iconName = (
               <ProfileIcon
                 color={focused ? '#EB5E28' : '#AAA'}
@@ -73,13 +74,19 @@ function Main() {
         },
       })}>
       <Tab.Screen
-        name="Home"
-        component={HomeScreen}
+        name="HomeStack"
+        component={HomeStackNavigator}
         options={{headerShown: false}}
       />
-      <Tab.Screen name="Library" component={LibraryScreen} />
-      <Tab.Screen name="Write" component={WriteScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen
+        name="LibraryStack"
+        component={LibraryStackNavigator}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Tab.Screen name="WriteStack" component={WriteScreen} />
+      <Tab.Screen name="ProfileStack" component={ProfileScreen} />
     </Tab.Navigator>
   );
 }

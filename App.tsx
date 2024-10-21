@@ -8,6 +8,9 @@ import BookDetail from './src/component/bookDetail/BookDetail.tsx';
 import IndividualChapter from './src/component/bookDetail/Util/IndividualChapter.tsx';
 import ReviewCard from './src/component/bookDetail/Util/ReviewCard.tsx';
 
+
+
+
 const App = () => {
   return <Navigation />;
 };

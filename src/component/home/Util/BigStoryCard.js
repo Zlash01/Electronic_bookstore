@@ -1,25 +1,27 @@
 import {View, Text, Image, Touchable, TouchableOpacity} from 'react-native';
 import React from 'react';
 import limit from '../../../util/limitWord';
+import {useNavigation} from '@react-navigation/native';
 
-const BigStoryCard = (props: {
-  title: any;
-  idBooks: any;
-  description: any;
-  imageLink: any;
-  author: any;
-}) => {
+const BigStoryCard = props => {
+  const navigation = useNavigation();
+
   //extract props
   const {title, description, imageLink, author} = props;
 
   //limit number of words in title and description and replace the rest with '...'
 
-  const limitedTitle = limit(title, 35);
-  const limitedDescription = limit(description, 150);
+  console.log('Title', title);
+  console.log('Description', description);
+  const limitedTitle = title ? limit(title, 35) : '';
+  const limitedDescription = description ? limit(description, 150) : '';
 
   const bookNavigation = () => {
     //navigate to book page
-    console.log('Book Navigation');
+    console.log('Book Navigation ID', props.idBooks);
+    navigation.navigate('Detail', {
+      idBooks: props.idBooks,
+    });
   };
 
   return (

@@ -86,21 +86,23 @@ const Header = () => {
 };
 
 const BigStoryCardList = ({headerCard, subHeader}) => {
-  const [books, setBooks] = useState(null);
+  const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getTrendingBooks(1, 10)
-      .then(res => {
+    const fetchBooks = async () => {
+      try {
+        const res = await getTrendingBooks(1, 10);
         console.log('checklog:', res);
         setBooks(res.data.trendingBooks);
-      })
-      .catch(err => {
+      } catch (err) {
         console.log('error:', err);
-      })
-      .finally(() => {
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchBooks();
   }, []);
 
   useEffect(() => {

@@ -33,24 +33,6 @@ const TrendingCard = ({data}: {data: any[]}) => {
     itemVisiblePercentThreshold: 50,
   };
 
-  // const renderItem = ({item, index}: {item: any; index: number}) => {
-  //   //const isSelected = index === selectedBookIndex;
-  //   const inputRange = [
-  //     (index - 1) * ITEM_SIZE,
-  //     index * ITEM_SIZE,
-  //     (index + 1) * ITEM_SIZE,
-  //   ];
-  //   const translateY = scrollX.interpolate({
-  //     inputRange,
-  //     outputRange: [0, -50, 0],
-  //   });
-  //   return (
-  //     <Animated.View style={styles.cardContainer}>
-  //       <Image source={{uri: item.imageLink}} style={[styles.bookImage]} />
-  //     </Animated.View>
-  //   );
-  // };
-
   return (
     <View style={styles.container}>
       {/* Horizontal FlatList to show book images */}

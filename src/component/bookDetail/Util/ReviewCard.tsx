@@ -1,7 +1,7 @@
 import {View, Text, Image, Touchable, TouchableOpacity} from 'react-native';
 import React from 'react';
 import {Dimensions} from 'react-native';
-import ThumbUp from '../../../assets/svg/home/thumbs-up-outline.svg';
+import ThumbUp from '../../../assets/svg/bookDetail/thumbs-up-outline.svg';
 import limit from '../../../util/limitWord';
 
 const height = Dimensions.get('window').height;
