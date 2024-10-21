@@ -1,9 +1,7 @@
 import {
   View,
   Text,
-  Pressable,
   Dimensions,
-  Touchable,
   TouchableOpacity,
   ScrollView,
   FlatList,
@@ -21,6 +19,8 @@ import Lib from '../../assets/svg/bookDetail/library.svg';
 import LibAdd from '../../assets/svg/bookDetail/library_add.svg';
 import limit from '../../util/limitWord';
 import ReviewCard from './Util/ReviewCard';
+import ArrowBack from '../../assets/svg/universal/arrow_back.svg';
+import {useNavigation} from '@react-navigation/native';
 
 // dummy data from api
 const dummyData = {
@@ -168,12 +168,14 @@ const similarStories = [
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
-const BookDetail = (props: {idBooks: any}) => {
+const BookDetail = props => {
+  const navigation = useNavigation();
+
   // get book detail from api
   const bookDetail = dummyData;
 
   //functions
-  const rcmPercentage = (totalVoteRecommended: number, totalVote: number) => {
+  const rcmPercentage = (totalVoteRecommended, totalVote) => {
     return (totalVoteRecommended / totalVote) * 100;
   };
 
@@ -191,7 +193,7 @@ const BookDetail = (props: {idBooks: any}) => {
     setLibLoading(false);
   };
 
-  const tagsParser = (tags: string[]) => {
+  const tagsParser = tags => {
     return tags.join(', ');
   };
 
@@ -210,12 +212,7 @@ const BookDetail = (props: {idBooks: any}) => {
       ));
   };
 
-  const InfoBlockComponent = (props: {
-    title: string;
-    text: string;
-    paddingTop: number;
-    paddingBottom: number;
-  }) => {
+  const InfoBlockComponent = props => {
     const [expanded, setExpanded] = useState(false);
 
     const toggleExpand = () => {
@@ -280,7 +277,7 @@ const BookDetail = (props: {idBooks: any}) => {
     );
   };
 
-  const StatisticComponent = (props: {icon: any; text: any}) => {
+  const StatisticComponent = props => {
     const Icon = props.icon;
     return (
       <View
@@ -363,6 +360,19 @@ const BookDetail = (props: {idBooks: any}) => {
     <SafeAreaView style={{flex: 1, backgroundColor: '#00171F'}}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* book picture */}
+        <TouchableOpacity
+          style={{position: 'absolute', top: 10, left: 10, zIndex: 1}}
+          onPress={() => {
+            navigation.navigate('Home');
+          }}>
+          <ArrowBack
+            style={{
+              height: 30,
+              width: 30,
+              margin: 10,
+            }}
+          />
+        </TouchableOpacity>
         <View
           style={{
             justifyContent: 'center',
