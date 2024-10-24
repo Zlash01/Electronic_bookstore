@@ -1,11 +1,22 @@
-import {View, Text} from 'react-native';
+import {View, Text, ScrollView} from 'react-native';
 import React from 'react';
 
-const Chapters = () => {
+const Chapters = props => {
+  const RenderParts = () => {
+    return props.map((part, index) => (
+      <IndividualChapter
+        key={index}
+        chapterId={part.idParts}
+        chapterTitle={part.title}
+        chapterDate="2021-09-19"
+        chapterNumber={part.chapter}
+      />
+    ));
+  };
   return (
-    <View>
-      <Text>Chapters</Text>
-    </View>
+    <ScrollView>
+      <RenderParts />
+    </ScrollView>
   );
 };
 

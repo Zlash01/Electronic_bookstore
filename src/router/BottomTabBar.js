@@ -5,10 +5,11 @@ import {NavigationContainer} from '@react-navigation/native';
 
 import Home from '../component/home/Home.js';
 import Library from '../component/library/Library.js';
-import Write from '../component/write/Write.tsx';
+import Write from '../component/write/Write.js';
 import Profile from '../component/profile/Profile.tsx';
 import HomeStackNavigator from './Home.js';
 import LibraryStackNavigator from './Library.js';
+import WriteStackNavigator from './Write.js';
 
 import HomeIcon from '../assets/svg/bottomTabBar/home.svg';
 import LibraryIcon from '../assets/svg/bottomTabBar/library.svg';
@@ -85,7 +86,13 @@ function Main() {
           headerShown: false,
         }}
       />
-      <Tab.Screen name="WriteStack" component={WriteScreen} />
+      <Tab.Screen
+        name="WriteStack"
+        component={WriteStackNavigator}
+        options={{
+          headerShown: false,
+        }}
+      />
       <Tab.Screen name="ProfileStack" component={ProfileScreen} />
     </Tab.Navigator>
   );

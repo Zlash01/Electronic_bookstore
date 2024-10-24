@@ -451,7 +451,6 @@ const BookDetail = props => {
             alignItems: 'center',
             alignSelf: 'center',
             gap: 10,
-            //   backgroundColor: 'blue',
           }}>
           <TouchableOpacity
             style={{
@@ -566,7 +565,11 @@ const BookDetail = props => {
                 {bookDetail.totalChapter} Parts
               </Text>
             </View>
-            <TouchableOpacity style={{alignSelf: 'center'}}>
+            <TouchableOpacity
+              style={{alignSelf: 'center'}}
+              onPress={() => {
+                navigation.navigate('Chapters', props.chapters);
+              }}>
               <Text
                 style={{
                   fontSize: 16,

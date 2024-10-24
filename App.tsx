@@ -1,19 +1,14 @@
-import {View, Text} from 'react-native';
 import React from 'react';
-import Auth from './src/component/auth/Login';
-import {NavigationContainer} from '@react-navigation/native';
-import AuthStackScreen from './src/router/index.js';
 import Navigation from './src/router/index.js';
-import BookDetail from './src/component/bookDetail/BookDetail.tsx';
-import IndividualChapter from './src/component/bookDetail/Util/IndividualChapter.tsx';
-import ReviewCard from './src/component/bookDetail/Util/ReviewCard.tsx';
-
-
-
+import EditCard from './src/component/write/Util/EditCard.js';
 
 const App = () => {
-  return <Navigation />;
+  return <EditCard />;
 };
+
+// const App = () => {
+//   return <Navigation />;
+// };
 
 // const App = () => {
 //   return <AuthStackScreen />;
