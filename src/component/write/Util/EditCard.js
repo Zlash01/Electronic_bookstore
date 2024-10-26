@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Pressable,
 } from 'react-native';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useState, useRef} from 'react';
 import {Modal} from 'react-native';
 
 import Views from '../../../assets/svg/write/visibility.svg';
@@ -37,6 +37,31 @@ viewConversion = view => {
 
 const DropdownMenu = ({id, options, onSelect}) => {
   const [isSelect, setIsSelect] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({top: 0, right: 0});
+  const iconRef = useRef(null);
+
+  const measureIconPosition = () => {
+    console.log('Measuring icon position...');
+    if (iconRef.current) {
+      iconRef.current.measure((x, y, width, height, pageX, pageY) => {
+        // Calculate position based on icon's location
+        const windowHeight = Dimensions.get('window').height;
+        const dropdownHeight = options.length * 44; // Approximate height of dropdown
+
+        // Ensure dropdown doesn't go off screen bottom
+        const top = pageY + height;
+        const adjustedTop =
+          top + dropdownHeight > windowHeight ? pageY - dropdownHeight : top;
+
+        setDropdownPosition({
+          top: adjustedTop,
+          right: Dimensions.get('window').width - (pageX + width),
+        });
+        console.log('Dropdown position: ', dropdownPosition);
+        setIsSelect(true);
+      });
+    }
+  };
 
   const handleSelect = useCallback(
     label => {
@@ -51,12 +76,20 @@ const DropdownMenu = ({id, options, onSelect}) => {
   }, []);
 
   return (
-    <View style={{flex: 3, alignItems: 'center', justifyContent: 'flex-end'}}>
+    <View
+      style={{
+        flex: 3,
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        position: 'relative',
+      }}>
       <TouchableOpacity
+        ref={iconRef}
         hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
         onPress={() => {
           console.log('Options of book with id: ' + id);
           setIsSelect(!isSelect);
+          measureIconPosition();
         }}>
         <More />
       </TouchableOpacity>
@@ -65,7 +98,8 @@ const DropdownMenu = ({id, options, onSelect}) => {
         visible={isSelect}
         transparent={true}
         animationType="none"
-        onRequestClose={handleClose}>
+        onRequestClose={handleClose}
+        style={{}}>
         <Pressable
           style={{
             flex: 1,
@@ -75,8 +109,8 @@ const DropdownMenu = ({id, options, onSelect}) => {
           <View
             style={{
               position: 'absolute',
-              top: 70, // Adjust this value based on your More icon position
-              right: 20, // Adjust this value based on your More icon position
+              top: dropdownPosition.top,
+              right: dropdownPosition.right,
               width: 150,
               backgroundColor: '#00171F',
               borderRadius: 4,

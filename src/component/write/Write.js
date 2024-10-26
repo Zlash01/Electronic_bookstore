@@ -1,4 +1,10 @@
-import {View, Text, ScrollView, Dimensions} from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  Dimensions,
+  TouchableOpacity,
+} from 'react-native';
 import React, {useLayoutEffect} from 'react';
 import {SceneMap, TabView, TabBar} from 'react-native-tab-view';
 import EditCard from './Util/EditCard';
@@ -32,9 +38,11 @@ const Write = ({navigation}) => {
     navigation.setOptions({
       headerTitle: 'Write',
       headerRight: () => (
-        <Text style={{color: '#f8f8f8', fontWeight: '500', fontSize: 16}}>
-          New Story
-        </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('CreateStory')}>
+          <Text style={{color: '#f8f8f8', fontWeight: '500', fontSize: 16}}>
+            New Story
+          </Text>
+        </TouchableOpacity>
       ),
     });
   }, []);

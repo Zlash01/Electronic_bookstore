@@ -37,7 +37,7 @@ const Navigation = () => {
 
   return (
     <NavigationContainer>
-      {isLogin ? <Main /> : <AuthStackScreen />}
+      {!isLogin ? <Main /> : <AuthStackScreen />}
       {/* <Main /> */}
     </NavigationContainer>
   );

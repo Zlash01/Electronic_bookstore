@@ -1,6 +1,7 @@
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import Write from '../component/write/Write.js';
+import CreateStory from '../component/write/CreateStory.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -16,6 +17,7 @@ export default function WriteStackNavigator() {
         },
       }}>
       <Stack.Screen name="Write" component={Write} />
+      <Stack.Screen name="CreateStory" component={CreateStory} />
     </Stack.Navigator>
   );
 }

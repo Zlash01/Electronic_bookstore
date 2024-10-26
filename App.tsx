@@ -1,14 +1,9 @@
 import React from 'react';
 import Navigation from './src/router/index.js';
-import EditCard from './src/component/write/Util/EditCard.js';
 
 const App = () => {
-  return <EditCard />;
+  return <Navigation />;
 };
-
-// const App = () => {
-//   return <Navigation />;
-// };
 
 // const App = () => {
 //   return <AuthStackScreen />;

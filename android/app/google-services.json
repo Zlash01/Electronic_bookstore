@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1051305594418",
+    "project_id": "imageuploadcovereb",
+    "storage_bucket": "imageuploadcovereb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1051305594418:android:2b58e7305395bd19ec362b",
+        "android_client_info": {
+          "package_name": "com.eb"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxFQa6HPm2gL5BujlIPfR5dRqUrZ-RWlE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
