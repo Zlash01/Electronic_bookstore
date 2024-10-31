@@ -13,6 +13,7 @@ import React, {useEffect, useLayoutEffect, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
+import {createBook} from '../../api/apiController';
 
 import Add from '../../assets/svg/write/add.svg';
 
@@ -158,20 +159,12 @@ const ProceedButton = ({
     try {
       await reference.putFile(imageUri);
       const url = await reference.getDownloadURL();
-
+      console.log('Uploaded image URL:', url);
       Alert.alert('Upload Successful!', `Image URL: ${url}`);
       return url;
     } catch (error) {
       console.error('Upload Error:', error);
       Alert.alert('Upload Failed', error.message);
-    }
-  };
-
-  handleCreation = async () => {
-    if (cover && isLocalImage(cover)) {
-      await uploadImage(cover).then(url => {
-        Alert('Image uploaded successfully! URL: ' + url);
-      });
     }
   };
 
@@ -189,6 +182,21 @@ const ProceedButton = ({
       setText('Skip');
     }
   }, [title, description, cover]);
+
+  handleCreation = async () => {
+    if (cover && isLocalImage(cover)) {
+      await uploadImage(cover).then(url => {
+        console.log('api controller call');
+        createBook(title, description, url).then(response => {
+          if (response.status === 201) {
+            console.log(response.data);
+          } else {
+            Alert.alert('Error', 'Failed to create story');
+          }
+        });
+      });
+    }
+  };
 
   return (
     <TouchableOpacity
