@@ -5,47 +5,76 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import React, {useEffect, useLayoutEffect} from 'react';
+import React, {useEffect, useLayoutEffect, useState} from 'react';
 import {SceneMap, TabView, TabBar} from 'react-native-tab-view';
 import EditCard from './Util/EditCard';
 
-import {getAllUserBooks} from '../../api/apiController';
+import {
+  getAllUserDraftBooks,
+  getAllUserPublishedBooks,
+} from '../../api/apiController';
 
-const Publish = () => {
+const Publish = props => {
   return (
     <ScrollView
       style={{
         flex: 1,
         backgroundColor: '#00171F',
       }}>
-      <EditCard />
+      {/* <EditCard /> */}
     </ScrollView>
   );
 };
 
-const Draft = () => {
+const Draft = props => {
   return (
     <ScrollView
       style={{
         flex: 1,
         backgroundColor: '#00171F',
       }}>
-      <Text>Draft</Text>
+      {props.data.map((data, index) => (
+        <EditCard key={index} data={data} />
+      ))}
     </ScrollView>
   );
-};
-
-const onMount = async () => {
-  console.log('Getting all user books');
-  await getAllUserBooks().then(res => {
-    console.log(res);
-  });
 };
 
 const Write = ({navigation}) => {
+  const [publishData, setPublishData] = useState([]);
+  const [draftData, setDraftData] = useState([]);
+
   useEffect(() => {
     onMount();
   }, []);
+
+  const onMount = async () => {
+    console.log('Write Mounted');
+    console.log('getting publish data');
+    await getAllUserPublishedBooks().then(res => {
+      if (res.status === 404) {
+        console.log('No published data');
+      } else {
+        console.log('published: ', res);
+        setPublishData(res.data.userBooks);
+      }
+    });
+
+    console.log('getting draft data');
+    await getAllUserDraftBooks().then(res => {
+      if (res.status === 404) {
+        console.log('No draft data');
+      } else {
+        console.log('draft: ', res);
+        setDraftData(res.data.userBooks);
+      }
+    });
+  };
+
+  useEffect(() => {
+    console.log('Publish Data: ', publishData);
+    console.log('Draft Data: ', draftData);
+  }, [publishData, draftData]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -66,10 +95,16 @@ const Write = ({navigation}) => {
     {key: 'draft', title: 'Draft'},
   ]);
 
-  const renderScene = SceneMap({
-    publish: Publish,
-    draft: Draft,
-  });
+  const renderScene = ({route}) => {
+    switch (route.key) {
+      case 'publish':
+        return <Publish data={publishData} />;
+      case 'draft':
+        return <Draft data={draftData} />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <TabView

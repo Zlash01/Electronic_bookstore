@@ -94,7 +94,7 @@ const BigStoryCardList = ({headerCard, subHeader}) => {
     const fetchBooks = async () => {
       try {
         const res = await getTrendingBooks(1, 10);
-        // console.log('checklog:', res);
+        console.log('checklog:', res);
         setBooks(res.data.trendingBooks);
       } catch (err) {
         console.log('error:', err);
@@ -112,7 +112,7 @@ const BigStoryCardList = ({headerCard, subHeader}) => {
     return (
       <BigStoryCard
         title={item.title}
-        author={item.author}
+        authorId={item.authorId}
         idBooks={item._id}
         imageLink={item.coverImage}
         description={item.plot}
@@ -173,7 +173,7 @@ const ContinueCardList = ({headerCard, subHeader}) => {
     const fetchBooks = async () => {
       try {
         const res = await getTrendingBooks(1, 10);
-        // console.log('checklog:', res);
+        console.log('checklog:', res);
         setBooks(res.data.trendingBooks);
       } catch (err) {
         console.log('error:', err);

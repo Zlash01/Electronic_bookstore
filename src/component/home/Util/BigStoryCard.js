@@ -7,12 +7,12 @@ const BigStoryCard = props => {
   const navigation = useNavigation();
 
   //extract props
-  const {title, description, imageLink, author} = props;
+  const {title, description, imageLink, authorId} = props;
+  console.log('BigStoryCard:', props);
 
   //limit number of words in title and description and replace the rest with '...'
-
-  console.log('Title', title);
-  console.log('Description', description);
+  // console.log('Title', title);
+  // console.log('Description', description);
   const limitedTitle = title ? limit(title, 35) : '';
   const limitedDescription = description ? limit(description, 150) : '';
 
@@ -72,17 +72,22 @@ const BigStoryCard = props => {
               {limitedDescription}
             </Text>
             <Text
+              numberOfLines={1}
               style={{
                 color: '#d7d7d7',
                 fontSize: 14,
                 fontFamily: 'Poppins-Medium',
               }}>
-              Author: {author}
+              Author: User@{authorId}
             </Text>
           </View>
         </View>
         <Image
-          source={{uri: imageLink}}
+          source={
+            imageLink
+              ? {uri: imageLink}
+              : require('../../../assets/picture/universal/R.png')
+          }
           style={{
             width: 145,
             height: 200,

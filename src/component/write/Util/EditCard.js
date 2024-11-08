@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Pressable,
 } from 'react-native';
-import React, {useCallback, useState, useRef} from 'react';
+import React, {useCallback, useState, useRef, useEffect} from 'react';
 import {Modal} from 'react-native';
 
 import Views from '../../../assets/svg/write/visibility.svg';
@@ -16,16 +16,6 @@ import More from '../../../assets/svg/write/more_horiz.svg';
 import {useNavigation} from '@react-navigation/native';
 
 const HEIGHT = Dimensions.get('window').height;
-
-const data = {
-  title: 'The Beginning After The End',
-  coverImageLink: 'https://i.postimg.cc/8ckPPDky/image-1.png',
-  totalChapter: 100,
-  publishedChapter: 50,
-  rating: '80%',
-  view: 1000,
-  idBook: 1,
-};
 
 viewConversion = view => {
   //convert to k, m, b
@@ -143,15 +133,24 @@ const DropdownMenu = ({id, options, onSelect}) => {
 };
 
 const EditCard = props => {
-  // const navigation = useNavigation();
+  const navigation = useNavigation();
 
-  const title = data.title;
-  const coverImageLink = data.coverImageLink;
-  const publishedChapter = data.publishedChapter;
-  const totalChapter = data.totalChapter;
-  const rating = data.rating;
-  const view = viewConversion(data.view);
-  const id = data.idBook;
+  const title = props.data?.title ? props.data.title : 'No Title';
+  const coverImageLink = props.data?.coverImage ? props.data.coverImage : '';
+
+  const totalChapter = props.data?.chapters?.length
+    ? props.data.chapters.length
+    : 0;
+  const rating =
+    props.data?.positiveVotes && props.data?.totalVotes
+      ? props.data.positiveVotes / props.data.totalVotes
+      : 0;
+  const view = viewConversion(props.data?.views || 0);
+  const id = props.data?._id;
+
+  // useEffect(() => {
+  //   console.log('EditCard data: ', props);
+  // }, [props]);
 
   const options = [
     {label: 'View as Reader', action: () => console.log('View as Reader')},
@@ -188,99 +187,104 @@ const EditCard = props => {
   };
 
   return (
-    <View
-      style={{
-        backgroundColor: '#00171F',
-        width: '100%',
-        height: HEIGHT * 0.17,
-        flexDirection: 'row',
-
-        borderBottomWidth: 1,
-        borderColor: '#323232',
-      }}>
+    <TouchableOpacity>
       <View
         style={{
-          flex: 2,
-          alignItems: 'center',
-          justifyContent: 'center',
+          backgroundColor: '#00171F',
+          width: '100%',
+          height: HEIGHT * 0.17,
+          flexDirection: 'row',
+
+          borderBottomWidth: 1,
+          borderColor: '#323232',
         }}>
-        <Image
-          src={coverImageLink}
-          style={{
-            width: (3 / 4) * HEIGHT * 0.15,
-            height: HEIGHT * 0.15,
-            resizeMode: 'contain',
-          }}
-        />
-      </View>
-      <View style={{flex: 5, marginVertical: 10}}>
-        <View>
-          <Text
-            numberOfLines={1}
-            style={{
-              color: 'white',
-              fontSize: 18,
-              fontFamily: 'Poppins-Medium',
-            }}>
-            {title}
-          </Text>
-        </View>
         <View
           style={{
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
+            flex: 2,
             alignItems: 'center',
-            gap: 10,
+            justifyContent: 'center',
           }}>
-          <View
+          <Image
+            src={coverImageLink}
             style={{
-              paddingHorizontal: 5,
-              paddingVertical: 2,
-              backgroundColor: '#323232',
-              borderRadius: 5,
-            }}>
-            <Text style={{color: '#f8f8f8', fontSize: 14}}>
-              {publishedChapter} Published Chapters
-            </Text>
-          </View>
-          <View>
-            <Text style={{color: '#989898', fontSize: 14}}>
-              {totalChapter - publishedChapter} Drafts
-            </Text>
-          </View>
+              width: (3 / 4) * HEIGHT * 0.15,
+              height: HEIGHT * 0.15,
+              resizeMode: 'contain',
+            }}
+          />
         </View>
-        <View style={{flexDirection: 'row'}}>
+        <View style={{flex: 5, marginVertical: 10}}>
+          <View>
+            <Text
+              numberOfLines={1}
+              style={{
+                color: 'white',
+                fontSize: 18,
+                fontFamily: 'Poppins-Medium',
+              }}>
+              {title}
+            </Text>
+          </View>
           <View
             style={{
               flexDirection: 'row',
-              marginTop: 8,
+              justifyContent: 'flex-start',
               alignItems: 'center',
-              gap: 12,
-              flex: 7,
+              gap: 10,
             }}>
-            <View style={{flexDirection: 'row', alignItems: 'center', gap: 3}}>
-              <Views />
-              <Text style={{color: '#989898', fontSize: 14}}>{view}</Text>
-            </View>
-            <View style={{flexDirection: 'row', alignItems: 'center', gap: 3}}>
-              <Rating />
-              <Text style={{color: '#989898', fontSize: 14}}>{rating}</Text>
-            </View>
-            <View style={{flexDirection: 'row', alignItems: 'center', gap: 3}}>
-              <Toc />
-              <Text style={{color: '#989898', fontSize: 14}}>
-                {totalChapter}
+            <View
+              style={{
+                paddingHorizontal: 5,
+                paddingVertical: 2,
+                backgroundColor: '#323232',
+                borderRadius: 5,
+              }}>
+              <Text style={{color: '#f8f8f8', fontSize: 14}}>
+                {totalChapter} Chapters
               </Text>
             </View>
+            {/* <View>
+            <Text style={{color: '#989898', fontSize: 14}}>
+              {totalChapter - publishedChapter} Drafts
+            </Text>
+          </View> */}
           </View>
-          <DropdownMenu
-            id={id}
-            options={options}
-            onSelect={handleOptionSelect}
-          />
+          <View style={{flexDirection: 'row'}}>
+            <View
+              style={{
+                flexDirection: 'row',
+                marginTop: 8,
+                alignItems: 'center',
+                gap: 12,
+                flex: 7,
+              }}>
+              <View
+                style={{flexDirection: 'row', alignItems: 'center', gap: 3}}>
+                <Views />
+                <Text style={{color: '#989898', fontSize: 14}}>{view}</Text>
+              </View>
+              <View
+                style={{flexDirection: 'row', alignItems: 'center', gap: 3}}>
+                <Rating />
+                <Text style={{color: '#989898', fontSize: 14}}>{rating}</Text>
+              </View>
+              <View
+                style={{flexDirection: 'row', alignItems: 'center', gap: 3}}>
+                <Toc />
+                <Text style={{color: '#989898', fontSize: 14}}>
+                  {totalChapter}
+                </Text>
+              </View>
+            </View>
+            <DropdownMenu
+              id={id}
+              options={options}
+              onSelect={handleOptionSelect}
+            />
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
