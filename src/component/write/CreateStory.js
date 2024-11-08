@@ -13,9 +13,10 @@ import React, {useEffect, useLayoutEffect, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
-import {createBook} from '../../api/apiController';
+import {createBook, createChapter} from '../../api/apiController';
 
 import Add from '../../assets/svg/write/add.svg';
+import {useNavigation} from '@react-navigation/native';
 
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
@@ -136,20 +137,17 @@ const StoryCover = props => {
   );
 };
 
-const ProceedButton = ({
-  navigation,
-  title = '',
-  description = '',
-  cover = '',
-}) => {
+const ProceedButton = ({title = '', description = '', cover = ''}) => {
+  const navigation = useNavigation(); // Move this up to the top
+  const [text, setText] = useState('Skip');
+
   function isLocalImage(uri) {
-    // Check if URI starts with file:///
     return uri.startsWith('file:///');
   }
 
   const uploadImage = async imageUri => {
     if (!imageUri) {
-      console.error('No image URI provided');
+      console.log('No image URI provided');
       return;
     }
 
@@ -157,21 +155,29 @@ const ProceedButton = ({
     const reference = storage().ref(filename);
 
     try {
-      await reference.putFile(imageUri);
+      console.log('Uploading image:', imageUri);
+
+      const task = reference.putFile(imageUri);
+
+      // Monitor upload progress
+      task.on('state_changed', taskSnapshot => {
+        const progress =
+          (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) * 100;
+        console.log(`Upload is ${progress}% done`);
+      });
+
+      await task;
       const url = await reference.getDownloadURL();
       console.log('Uploaded image URL:', url);
-      Alert.alert('Upload Successful!', `Image URL: ${url}`);
       return url;
     } catch (error) {
       console.error('Upload Error:', error);
-      Alert.alert('Upload Failed', error.message);
+      console.error('Upload Error Message:', error.message);
+      Alert.alert(error.message);
     }
   };
 
-  const [text, setText] = useState('Skip');
-
   useEffect(() => {
-    // Ensure we're working with strings and handle null/undefined values
     const hasTitle = String(title || '').trim() !== '';
     const hasDescription = String(description || '').trim() !== '';
     const hasCover = String(cover || '').trim() !== '';
@@ -183,26 +189,54 @@ const ProceedButton = ({
     }
   }, [title, description, cover]);
 
-  handleCreation = async () => {
-    if (cover && isLocalImage(cover)) {
-      await uploadImage(cover).then(url => {
-        console.log('api controller call');
-        createBook(title, description, url).then(response => {
-          if (response.status === 201) {
-            console.log(response.data);
-          } else {
-            Alert.alert('Error', 'Failed to create story');
-          }
-        });
-      });
+  const handleCreation = async () => {
+    try {
+      // Handle book creation
+      console.log('Creating story:', title, description, cover);
+      let bookResponse;
+      if (cover && isLocalImage(cover)) {
+        const url = await uploadImage(cover);
+        bookResponse = await createBook(title, description, url);
+      } else {
+        bookResponse = await createBook(title, description, cover);
+      }
+
+      // Check if book creation was successful
+      if (bookResponse.status !== 201) {
+        Alert.alert('Error', 'Failed to create story');
+        return;
+      }
+
+      console.log('Book creation successful:', bookResponse.data);
+
+      // Handle chapter creation separately
+      try {
+        const chapterResponse = await createChapter(bookResponse.data._id);
+        if (chapterResponse.status === 201) {
+          console.log('Chapter creation successful:', chapterResponse.data);
+          navigation.navigate('CreateChapter', {
+            response: chapterResponse.data,
+          });
+        } else {
+          Alert.alert('Error', 'Failed to create chapter');
+        }
+      } catch (chapterError) {
+        console.error('Error creating chapter:', chapterError);
+        Alert.alert(
+          'Error',
+          'Failed to create chapter: ' + chapterError.message,
+        );
+      }
+
+      return bookResponse;
+    } catch (error) {
+      console.error('Error creating story:', error);
+      Alert.alert('Error', 'Failed to create story: ' + error.message);
     }
   };
 
   return (
-    <TouchableOpacity
-      onPress={() => {
-        handleCreation();
-      }}>
+    <TouchableOpacity onPress={handleCreation}>
       <Text style={{color: '#f8f8f8', fontWeight: '500', fontSize: 16}}>
         {text}
       </Text>
@@ -221,7 +255,6 @@ const CreateStory = ({navigation}) => {
       headerRight: () => {
         return (
           <ProceedButton
-            navigation={navigation}
             title={title}
             description={description}
             cover={storyCover}

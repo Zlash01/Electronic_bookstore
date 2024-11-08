@@ -5,9 +5,11 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import React, {useLayoutEffect} from 'react';
+import React, {useEffect, useLayoutEffect} from 'react';
 import {SceneMap, TabView, TabBar} from 'react-native-tab-view';
 import EditCard from './Util/EditCard';
+
+import {getAllUserBooks} from '../../api/apiController';
 
 const Publish = () => {
   return (
@@ -33,7 +35,18 @@ const Draft = () => {
   );
 };
 
+const onMount = async () => {
+  console.log('Getting all user books');
+  await getAllUserBooks().then(res => {
+    console.log(res);
+  });
+};
+
 const Write = ({navigation}) => {
+  useEffect(() => {
+    onMount();
+  }, []);
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: 'Write',

@@ -18,6 +18,7 @@ import Tune from '../../assets/svg/home/tune.svg';
 import AccountDefault from '../../assets/svg/home/account_circle.svg';
 import {getTrendingBooks} from '../../api/apiController';
 import BigStoryCard from './Util/BigStoryCard';
+import ContinueCard from './Util/ContinueCard';
 
 const Header = () => {
   return (
@@ -93,7 +94,7 @@ const BigStoryCardList = ({headerCard, subHeader}) => {
     const fetchBooks = async () => {
       try {
         const res = await getTrendingBooks(1, 10);
-        console.log('checklog:', res);
+        // console.log('checklog:', res);
         setBooks(res.data.trendingBooks);
       } catch (err) {
         console.log('error:', err);
@@ -105,12 +106,8 @@ const BigStoryCardList = ({headerCard, subHeader}) => {
     fetchBooks();
   }, []);
 
-  useEffect(() => {
-    console.log('Books:', books);
-  }, [books]);
-
   const renderItem = ({item}) => {
-    console.log('Rendering Item:', item); // Log the data for each item
+    // console.log('Rendering Item:', item); // Log the data for each item
 
     return (
       <BigStoryCard
@@ -159,7 +156,86 @@ const BigStoryCardList = ({headerCard, subHeader}) => {
             ItemSeparatorComponent={() => <View style={{width: 16}} />} // Gap between items
             snapToAlignment="center"
             decelerationRate="fast"
-            snapToInterval={WIDTH * 0.85 + 16} // Adjust to item width + separator width
+            snapToInterval={WIDTH * 0.82} // Adjust to item width + separator width
+            pagingEnabled={true} // Optional: Snap behavior for iOS
+          />
+        )}
+      </View>
+    </View>
+  );
+};
+
+const ContinueCardList = ({headerCard, subHeader}) => {
+  const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const res = await getTrendingBooks(1, 10);
+        // console.log('checklog:', res);
+        setBooks(res.data.trendingBooks);
+      } catch (err) {
+        console.log('error:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBooks();
+  }, []);
+
+  const renderItem = ({item}) => {
+    console.log('Rendering Item:', item); // Log the data for each item
+
+    return (
+      <ContinueCard
+        title={item.title}
+        author={item.author}
+        idBooks={item._id}
+        imageLink={item.coverImage}
+        description={item.plot}
+      />
+    );
+  };
+
+  return (
+    <View style={{}}>
+      <View>
+        <Text
+          style={{
+            fontFamily: 'Poppins-SemiBold',
+            fontSize: 20,
+            color: '#F8F8F8',
+          }}>
+          {headerCard}
+        </Text>
+        <Text
+          style={{
+            fontFamily: 'Poppins-Regular',
+            fontSize: 14,
+            color: '#F8F8F8',
+          }}>
+          {subHeader}
+        </Text>
+      </View>
+      <View
+        style={{
+          marginTop: HEIGHT * 0.015,
+        }}>
+        {loading ? (
+          <ActivityIndicator size="large" color="#EB5E28" />
+        ) : (
+          <FlatList
+            data={books}
+            keyExtractor={item => item._id}
+            renderItem={renderItem}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={{width: 16}} />} // Gap between items
+            snapToAlignment="center"
+            decelerationRate="fast"
+            snapToInterval={WIDTH * 0.82} // Adjust to item width + separator width
             pagingEnabled={true} // Optional: Snap behavior for iOS
           />
         )}
@@ -185,6 +261,10 @@ const Home = () => {
         <BigStoryCardList
           headerCard={'Completed Stories'}
           subHeader={'Binge from start to finish'}
+        />
+        <ContinueCardList
+          headerCard={'Continue Reading'}
+          subHeader={'Pick up where you left off'}
         />
       </View>
     </ScrollView>
