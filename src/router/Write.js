@@ -3,6 +3,8 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Write from '../component/write/Write.js';
 import CreateStory from '../component/write/CreateStory.js';
 import CreateChapter from '../component/write/CreateChapter.js';
+import EditStory from '../component/write/EditStory.js';
+import TagSelection from '../component/write/TagSelection.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +22,8 @@ export default function WriteStackNavigator() {
       <Stack.Screen name="Write" component={Write} />
       <Stack.Screen name="CreateStory" component={CreateStory} />
       <Stack.Screen name="CreateChapter" component={CreateChapter} />
+      <Stack.Screen name="EditStory" component={EditStory} />
+      <Stack.Screen name="TagSelection" component={TagSelection} />
     </Stack.Navigator>
   );
 }

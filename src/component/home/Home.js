@@ -94,7 +94,7 @@ const BigStoryCardList = ({headerCard, subHeader}) => {
     const fetchBooks = async () => {
       try {
         const res = await getTrendingBooks(1, 10);
-        console.log('checklog:', res);
+        // console.log('checklog:', res);
         setBooks(res.data.trendingBooks);
       } catch (err) {
         console.log('error:', err);
@@ -173,7 +173,6 @@ const ContinueCardList = ({headerCard, subHeader}) => {
     const fetchBooks = async () => {
       try {
         const res = await getTrendingBooks(1, 10);
-        console.log('checklog:', res);
         setBooks(res.data.trendingBooks);
       } catch (err) {
         console.log('error:', err);
@@ -186,8 +185,7 @@ const ContinueCardList = ({headerCard, subHeader}) => {
   }, []);
 
   const renderItem = ({item}) => {
-    console.log('Rendering Item:', item); // Log the data for each item
-
+    // console.log('Rendering Item:', item); // Log the data for each item
     return (
       <ContinueCard
         title={item.title}
@@ -262,9 +260,10 @@ const Home = () => {
           headerCard={'Completed Stories'}
           subHeader={'Binge from start to finish'}
         />
+        <View style={{height: 40}}></View>
         <ContinueCardList
-          headerCard={'Continue Reading'}
-          subHeader={'Pick up where you left off'}
+          headerCard={'Recommended for you'}
+          subHeader={'Stories you might like'}
         />
       </View>
     </ScrollView>

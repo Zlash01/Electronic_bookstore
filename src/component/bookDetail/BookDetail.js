@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ScrollView,
   FlatList,
+  Alert,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -21,6 +22,8 @@ import limit from '../../util/limitWord';
 import ReviewCard from './Util/ReviewCard';
 import ArrowBack from '../../assets/svg/universal/arrow_back.svg';
 import {useNavigation} from '@react-navigation/native';
+import {getSingleBookData} from '../../api/apiController';
+import {get} from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 
 // dummy data from api
 const dummyData = {
@@ -168,15 +171,35 @@ const similarStories = [
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
-const BookDetail = props => {
+const BookDetail = ({route}) => {
   const navigation = useNavigation();
+  console.log('Book Detail Params:', route.params);
+  const {idBooks} = route.params;
+  const [bookData, setBookData] = useState({});
+
+  useEffect(() => {
+    // get book detail from api
+    const getBookData = async () => {
+      await getSingleBookData(idBooks).then(res => {
+        if (res.status === 200) {
+          setBookData(res.data);
+        } else {
+          console.log('Error:', res);
+          Alert.alert('Error', 'Failed to get book data', res.data);
+        }
+      });
+    };
+    getBookData();
+  }, [idBooks]);
+
+  console.log('Book Data:', bookData);
 
   // get book detail from api
   const bookDetail = dummyData;
 
   //functions
   const rcmPercentage = (totalVoteRecommended, totalVote) => {
-    return (totalVoteRecommended / totalVote) * 100;
+    return totalVote > 0 ? (totalVoteRecommended / totalVote) * 100 : 0;
   };
 
   const [added, setAdded] = React.useState(false);
@@ -381,7 +404,7 @@ const BookDetail = props => {
             marginTop: 30,
           }}>
           <Image
-            source={{uri: bookDetail.imageLink}}
+            source={{uri: bookData.coverImage}}
             style={{height: 200, width: 150}}
             resizeMode="contain"
           />
@@ -395,7 +418,7 @@ const BookDetail = props => {
               fontFamily: 'Poppins-SemiBold',
               textAlign: 'center',
             }}>
-            {bookDetail.title}
+            {bookData.title}
           </Text>
         </View>
         {/* book author */}
@@ -429,17 +452,21 @@ const BookDetail = props => {
             gap: 20,
             marginTop: 15,
           }}>
-          <StatisticComponent icon={Vis} text={`${bookDetail.totalView}k`} />
+          <StatisticComponent icon={Vis} text={`${bookData.views}`} />
           <StatisticComponent
             icon={Star}
             text={`${rcmPercentage(
-              bookDetail.totalVoteRecommended,
-              bookDetail.totalVote,
+              bookData.positiveVote,
+              bookData.totalVote,
             )}%`}
           />
           <StatisticComponent
             icon={TOC}
-            text={`${bookDetail.totalChapter} Chapters`}
+            text={`${
+              bookData.chapters?.length
+                ? bookData.chapters?.length
+                : bookData.totalChapter
+            } Chapters`}
           />
         </View>
         {/* book CTA */}

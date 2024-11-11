@@ -31,6 +31,7 @@ import Google from '../../assets/svg/auth/google.svg';
 import Visability from '../../assets/svg/auth/visibility.svg';
 import VisabilityOff from '../../assets/svg/auth/visibility_off.svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {ref} from '@react-native-firebase/storage';
 
 const screenSize = Dimensions.get('window');
 
@@ -89,7 +90,10 @@ const Login = ({navigation}: {navigation: NavigationProp<any>}) => {
           //save remember password and username to local storage
           console.log('Save username to local storage');
           AsyncStorage.setItem('username', username);
-          console.log('Save refresh token to local storage');
+          console.log(
+            'Save refresh token to local storage',
+            response.data.refreshToken,
+          );
           AsyncStorage.setItem('refreshToken', response.data.refreshToken);
           if (isChecked) {
             console.log('Save password to local storage');

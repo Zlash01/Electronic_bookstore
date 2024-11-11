@@ -186,8 +186,14 @@ const EditCard = props => {
     }
   };
 
+  const handleEditPress = () => {
+    //navigate to EditStory screen with props
+    // console.log('props data: from EditCard', props.data);
+    navigation.navigate('EditStory', {data: props.data});
+  };
+
   return (
-    <TouchableOpacity>
+    <TouchableOpacity onPress={() => handleEditPress()}>
       <View
         style={{
           backgroundColor: '#00171F',

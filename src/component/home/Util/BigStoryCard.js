@@ -8,7 +8,7 @@ const BigStoryCard = props => {
 
   //extract props
   const {title, description, imageLink, authorId} = props;
-  console.log('BigStoryCard:', props);
+  // console.log('BigStoryCard:', props);
 
   //limit number of words in title and description and replace the rest with '...'
   // console.log('Title', title);
