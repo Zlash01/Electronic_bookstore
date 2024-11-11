@@ -489,3 +489,122 @@ export const updateBook = async (
     throw error;
   }
 };
+
+export const publishBook = async bookId => {
+  const {accessToken} = useAuthStore.getState();
+  if (!accessToken) {
+    const {logout} = useAuthStore.getState();
+    console.error('Access token is null');
+    Alert.alert(
+      'Invalid session, please log in again, error msg: Access token is null',
+    );
+    AsyncStorage.removeItem('refreshToken');
+    logout();
+    return;
+  }
+  try {
+    const response = await axios.put(
+      `http://${IP}/api/book/publishBook/${bookId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        timeout: 5000,
+      },
+    );
+    return {status: response.status, data: response.data};
+  } catch (error) {
+    if (error.response) {
+      console.error('Server error:', error.response.status);
+      console.log('Error:', error.response.data);
+    } else if (error.request) {
+      console.error(
+        'No response received, server may be down or unreachable:',
+        error.request,
+      );
+    } else {
+      console.error('Error:', error.message);
+    }
+    throw error;
+  }
+};
+
+export const unpublishBook = async bookId => {
+  const {accessToken} = useAuthStore.getState();
+  if (!accessToken) {
+    const {logout} = useAuthStore.getState();
+    console.error('Access token is null');
+    Alert.alert(
+      'Invalid session, please log in again, error msg: Access token is null',
+    );
+    AsyncStorage.removeItem('refreshToken');
+    logout();
+    return;
+  }
+  try {
+    const response = await axios.put(
+      `http://${IP}/api/book/unpublishBook/${bookId}`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        timeout: 5000,
+      },
+    );
+    return {status: response.status, data: response.data};
+  } catch (error) {
+    if (error.response) {
+      console.error('Server error:', error.response.status);
+      console.log('Error:', error.response.data);
+    } else if (error.request) {
+      console.error(
+        'No response received, server may be down or unreachable:',
+        error.request,
+      );
+    } else {
+      console.error('Error:', error.message);
+    }
+    throw error;
+  }
+};
+
+export const deleteBook = async bookId => {
+  const {accessToken} = useAuthStore.getState();
+  if (!accessToken) {
+    const {logout} = useAuthStore.getState();
+    console.error('Access token is null');
+    Alert.alert(
+      'Invalid session, please log in again, error msg: Access token is null',
+    );
+    AsyncStorage.removeItem('refreshToken');
+    logout();
+    return;
+  }
+  try {
+    const response = await axios.delete(
+      `http://${IP}/api/book/deleteBook/${bookId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        timeout: 5000,
+      },
+    );
+    return {status: response.status, data: response.data};
+  } catch (error) {
+    if (error.response) {
+      console.error('Server error:', error.response.status);
+      console.log('Error:', error.response.data);
+    } else if (error.request) {
+      console.error(
+        'No response received, server may be down or unreachable:',
+        error.request,
+      );
+    } else {
+      console.error('Error:', error.message);
+    }
+    throw error;
+  }
+};

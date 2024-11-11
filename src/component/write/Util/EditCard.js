@@ -5,6 +5,7 @@ import {
   Image,
   TouchableOpacity,
   Pressable,
+  Alert,
 } from 'react-native';
 import React, {useCallback, useState, useRef, useEffect} from 'react';
 import {Modal} from 'react-native';
@@ -14,6 +15,11 @@ import Rating from '../../../assets/svg/write/rating.svg';
 import Toc from '../../../assets/svg/write/toc.svg';
 import More from '../../../assets/svg/write/more_horiz.svg';
 import {useNavigation} from '@react-navigation/native';
+import {
+  publishBook,
+  unpublishBook,
+  deleteBook,
+} from '../../../api/apiController';
 
 const HEIGHT = Dimensions.get('window').height;
 
@@ -132,42 +138,111 @@ const DropdownMenu = ({id, options, onSelect}) => {
   );
 };
 
-const EditCard = props => {
-  const navigation = useNavigation();
+const EditCard = ({data, navigation, onRefresh}) => {
+  const title = data?.title ? data.title : 'No Title';
+  const coverImageLink = data?.coverImage
+    ? {uri: data.coverImage} // Remote image needs to be wrapped in {uri: url}
+    : require('../../../assets/picture/universal/R.png'); // Local image can be required directly
 
-  const title = props.data?.title ? props.data.title : 'No Title';
-  const coverImageLink = props.data?.coverImage ? props.data.coverImage : '';
-
-  const totalChapter = props.data?.chapters?.length
-    ? props.data.chapters.length
-    : 0;
+  const totalChapter = data?.chapters?.length ? data.chapters.length : 0;
   const rating =
-    props.data?.positiveVotes && props.data?.totalVotes
-      ? props.data.positiveVotes / props.data.totalVotes
+    data?.positiveVotes && data?.totalVotes
+      ? data.positiveVotes / data.totalVotes
       : 0;
-  const view = viewConversion(props.data?.views || 0);
-  const id = props.data?._id;
-
-  // useEffect(() => {
-  //   console.log('EditCard data: ', props);
-  // }, [props]);
+  const view = viewConversion(data?.views || 0);
+  const id = data?._id;
+  const published = data?.isPublish;
 
   const options = [
-    {label: 'View as Reader', action: () => console.log('View as Reader')},
-    {label: 'Unpublish', action: () => console.log('Unpublish')},
-    {label: 'Delete', action: () => console.log('Delete')},
+    {label: 'View as Reader'},
+    published ? {label: 'Unpublish'} : {label: 'Publish'},
+    {label: 'Delete'},
   ];
 
   const handlePreview = () => {
     console.log('Preview book with id: ' + id);
   };
 
-  const handleUnpublish = () => {
-    console.log('Unpublish book with id: ' + id);
-  };
-
   const handleDelete = () => {
     console.log('Delete book with id: ' + id);
+    Alert.alert('Delete', 'Are you sure you want to delete this book?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Delete',
+        onPress: async () => {
+          try {
+            const res = await deleteBook(id);
+            if (res.status === 200) {
+              console.log('Deleted book with id: ' + id);
+              Alert.alert('Success', 'Book deleted successfully', [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    if (typeof onRefresh === 'function') {
+                      onRefresh();
+                    }
+                  },
+                },
+              ]);
+            } else {
+              Alert.alert('Error', 'Failed to delete book');
+            }
+          } catch (error) {
+            console.error('Error deleting book:', error);
+            Alert.alert('Error', 'An error occurred while deleting the book');
+          }
+        },
+      },
+    ]);
+  };
+
+  const handlePublish = async () => {
+    try {
+      const res = await publishBook(id);
+      if (res.status === 200) {
+        Alert.alert('Success', 'Book published successfully', [
+          {
+            text: 'OK',
+            onPress: () => {
+              if (typeof onRefresh === 'function') {
+                onRefresh();
+              }
+            },
+          },
+        ]);
+      } else {
+        Alert.alert('Error', 'Failed to publish book');
+      }
+    } catch (error) {
+      console.error('Error publishing book:', error);
+      Alert.alert('Error', 'An error occurred while publishing the book');
+    }
+  };
+
+  const handleUnpublish = async () => {
+    try {
+      const res = await unpublishBook(id);
+      if (res.status === 200) {
+        Alert.alert('Success', 'Book unpublished successfully', [
+          {
+            text: 'OK',
+            onPress: () => {
+              if (typeof onRefresh === 'function') {
+                onRefresh();
+              }
+            },
+          },
+        ]);
+      } else {
+        Alert.alert('Error', 'Failed to unpublish book');
+      }
+    } catch (error) {
+      console.error('Error unpublishing book:', error);
+      Alert.alert('Error', 'An error occurred while unpublishing the book');
+    }
   };
 
   const handleOptionSelect = value => {
@@ -177,6 +252,9 @@ const EditCard = props => {
         break;
       case 'Unpublish':
         handleUnpublish();
+        break;
+      case 'Publish':
+        handlePublish();
         break;
       case 'Delete':
         handleDelete();
@@ -189,7 +267,7 @@ const EditCard = props => {
   const handleEditPress = () => {
     //navigate to EditStory screen with props
     // console.log('props data: from EditCard', props.data);
-    navigation.navigate('EditStory', {data: props.data});
+    navigation.navigate('EditStory', {data: data});
   };
 
   return (
@@ -211,7 +289,7 @@ const EditCard = props => {
             justifyContent: 'center',
           }}>
           <Image
-            src={coverImageLink}
+            source={coverImageLink}
             style={{
               width: (3 / 4) * HEIGHT * 0.15,
               height: HEIGHT * 0.15,

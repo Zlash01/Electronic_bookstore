@@ -201,6 +201,7 @@ const ProceedButton = ({
       }
 
       console.log('Book update successful:', bookResponse.data);
+      Alert.alert('Success', 'Story updated successfully');
       return bookResponse;
     } catch (error) {
       console.error('Error creating story:', error);
