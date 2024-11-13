@@ -24,6 +24,7 @@ import ArrowBack from '../../assets/svg/universal/arrow_back.svg';
 import {useNavigation} from '@react-navigation/native';
 import {getSingleBookData} from '../../api/apiController';
 import {get} from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+import Loading from '../loading/loading';
 
 // dummy data from api
 const dummyData = {
@@ -171,28 +172,33 @@ const similarStories = [
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
-const BookDetail = ({route}) => {
-  const navigation = useNavigation();
+const BookDetail = ({navigation, route}) => {
   console.log('Book Detail Params:', route.params);
   const {idBooks} = route.params;
   const [bookData, setBookData] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // get book detail from api
     const getBookData = async () => {
-      await getSingleBookData(idBooks).then(res => {
+      try {
+        setLoading(true); // Start loading
+
+        const res = await getSingleBookData(idBooks);
         if (res.status === 200) {
           setBookData(res.data);
         } else {
           console.log('Error:', res);
           Alert.alert('Error', 'Failed to get book data', res.data);
         }
-      });
+      } catch (error) {
+        console.log('Error:', error);
+        Alert.alert('Error', 'An unexpected error occurred');
+      } finally {
+        setLoading(false); // Stop loading
+      }
     };
     getBookData();
   }, [idBooks]);
-
-  console.log('Book Data:', bookData);
 
   // get book detail from api
   const bookDetail = dummyData;
@@ -217,19 +223,19 @@ const BookDetail = ({route}) => {
   };
 
   const tagsParser = tags => {
-    return tags.join(', ');
+    return tags ? tags.join(', ') : '';
   };
 
   //small components
   const RenderParts = () => {
-    return bookDetail.parts
+    return bookData.chapters
       .slice(0, 3)
       .map((part, index) => (
         <IndividualChapter
           key={index}
           chapterId={part.idParts}
           chapterTitle={part.title}
-          chapterDate="2021-09-19"
+          chapterDate={part.createdAt}
           chapterNumber={part.chapter}
         />
       ));
@@ -274,7 +280,7 @@ const BookDetail = ({route}) => {
           {expanded ? props.text : limit(props.text, 200)}
         </Text>
 
-        {props.text.length > 200 && (
+        {props.text.length && props.text.length > 200 && (
           <TouchableOpacity
             onPress={toggleExpand}
             style={{
@@ -379,6 +385,10 @@ const BookDetail = ({route}) => {
     );
   };
 
+  if (loading) {
+    return <Loading />;
+  }
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#00171F'}}>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -429,10 +439,10 @@ const BookDetail = ({route}) => {
             alignItems: 'center',
             gap: 10,
           }}>
-          <Image
+          {/* <Image
             source={{uri: bookDetail.authorImage}}
             style={{height: 32, width: 32, borderRadius: 1000}}
-          />
+          /> */}
           <Text
             style={{
               color: '#D2CEDC',
@@ -440,7 +450,7 @@ const BookDetail = ({route}) => {
               fontFamily: 'Poppins-Regular',
               textAlign: 'center',
             }}>
-            {bookDetail.author}
+            Author: {bookData.authorName}
           </Text>
         </View>
         {/* book statistic */}
@@ -480,6 +490,13 @@ const BookDetail = ({route}) => {
             gap: 10,
           }}>
           <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('Read', {
+                idChapter: bookData.chapters[0]._id,
+                bookTitle: bookData.title,
+                chapterNumber: 1,
+              })
+            }
             style={{
               flex: 11,
               flexDirection: 'row',
@@ -544,14 +561,14 @@ const BookDetail = ({route}) => {
           {/* book tags*/}
           <InfoBlockComponent
             title="Tags:"
-            text={tagsParser(bookDetail.tags)}
+            text={tagsParser(bookData.tags)}
             paddingTop={15}
             paddingBottom={0}
           />
           {/* book description */}
           <InfoBlockComponent
             title="Plot:"
-            text={bookDetail.description}
+            text={bookData.plot}
             paddingBottom={25}
             paddingTop={10}
           />
@@ -589,14 +606,11 @@ const BookDetail = ({route}) => {
                   paddingTop: 2,
                   // backgroundColor: 'green',
                 }}>
-                {bookDetail.totalChapter} Parts
+                {bookData.chapters?.length ? bookData.chapters?.length : 0}{' '}
+                Parts
               </Text>
             </View>
-            <TouchableOpacity
-              style={{alignSelf: 'center'}}
-              onPress={() => {
-                navigation.navigate('Chapters', props.chapters);
-              }}>
+            <TouchableOpacity style={{alignSelf: 'center'}}>
               <Text
                 style={{
                   fontSize: 16,

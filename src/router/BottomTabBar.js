@@ -26,15 +26,36 @@ const Tab = createBottomTabNavigator();
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
 
+// In BottomTabBar.js
 function Main() {
+  // Define screens where tab bar should be hidden
+  const HIDDEN_TAB_SCREENS = ['Read'];
+
+  const shouldShowTabBar = navigation => {
+    const state = navigation.getState();
+
+    // Check each stack navigator's current screen
+    for (const route of state.routes) {
+      if (route.state?.routes) {
+        const currentScreen = route.state.routes.slice(-1)[0];
+        if (currentScreen && HIDDEN_TAB_SCREENS.includes(currentScreen.name)) {
+          return false; // Hide tab bar
+        }
+      }
+    }
+
+    return true; // Show tab bar
+  };
+
   return (
     <Tab.Navigator
       initialRouteName={'HomeStack'}
-      screenOptions={({route}) => ({
+      screenOptions={({route, navigation}) => ({
         tabBarShowLabel: false,
         tabBarStyle: {
           height: HEIGHT * 0.07,
           backgroundColor: 'black',
+          display: shouldShowTabBar(navigation) ? 'flex' : 'none',
         },
         tabBarIcon: ({focused, size = 24, color = '#AAA'}) => {
           let iconName;

@@ -1,5 +1,6 @@
 export default function limit(text: string, limit: number): string {
   const truncateAtWordBoundary = (text: string, limit: number): string => {
+    if (!text) return '';
     if (text.length <= limit) return text;
 
     const truncated = text.substring(0, limit);
