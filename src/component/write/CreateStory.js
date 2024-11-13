@@ -244,7 +244,7 @@ const ProceedButton = ({title = '', description = '', cover = ''}) => {
   );
 };
 
-const CreateStory = ({navigation}) => {
+const CreateStory = ({navigation, route}) => {
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [storyCover, setStoryCover] = React.useState('');

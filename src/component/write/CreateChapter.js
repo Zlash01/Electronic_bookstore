@@ -8,8 +8,8 @@ import {
 } from 'react-native';
 import React, {useEffect, useLayoutEffect, useState} from 'react';
 import MoreVert from './../../assets/svg/universal/more_vert.svg';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {updateChapter} from '../../api/apiController';
+import ArrowBack from './../../assets/svg/universal/arrow_back.svg';
 
 const CreateChapter = ({navigation, route}) => {
   const [chapterTitle, setChapterTitle] = useState('This is a title');
@@ -25,36 +25,39 @@ const CreateChapter = ({navigation, route}) => {
     const isChanged =
       chapterTitle !== savedTitle || chapterContent !== savedContent;
     setHasChanges(isChanged);
-    // console.log('Title or content changed:', {
-    //   chapterTitle,
-    //   chapterContent,
-    //   savedTitle,
-    //   savedContent,
-    //   hasChanges: isChanged,
-    // });
   }, [chapterTitle, chapterContent, savedTitle, savedContent]);
 
   useEffect(() => {
-    console.log('data recieved: ', route.params);
-    if (route.params.content) {
-      setChapterContent(route.params.content);
-      setSavedContent(route.params.content);
-    } else {
-      setChapterContent('');
-      setSavedContent('');
+    // Check if we have received chapter data
+    const response = route.params?.response;
+    if (response) {
+      // Set the initial content and title from the response
+      const initialContent = response.content || '';
+      const initialTitle = response.title || '';
+
+      setChapterContent(initialContent);
+      setSavedContent(initialContent);
+      setChapterTitle(initialTitle);
+      setSavedTitle(initialTitle);
+
+      console.log('Loaded chapter data:', {
+        title: initialTitle,
+        content: initialContent,
+      });
     }
-    if (route.params.title) {
-      setChapterTitle(route.params.title);
-      setSavedTitle(route.params.title);
-    } else {
-      setChapterTitle('');
-      setSavedTitle('');
-    }
-  }, []);
+  }, [route.params?.response]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: 'Create',
+      // Add custom back button behavior
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Write')}
+          style={{marginLeft: 10, marginRight: 15}}>
+          <ArrowBack height={24} width={24} />
+        </TouchableOpacity>
+      ),
       headerRight: () => {
         return (
           <View

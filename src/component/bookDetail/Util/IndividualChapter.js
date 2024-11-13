@@ -1,14 +1,22 @@
 import {Text, TouchableOpacity} from 'react-native';
 import React from 'react';
+import {useNavigation} from '@react-navigation/native';
 
-const IndividualChapter = (props: {
-  chapterId: number;
-  chapterTitle: string;
-  chapterDate: string;
-  chapterNumber: number;
-}) => {
+const IndividualChapter = props => {
+  const navigation = useNavigation();
+
+  console.log('IndividualChapter', props);
+
+  const handleChapterPress = () => {
+    navigation.navigate('Read', {
+      idChapter: props.chapterId,
+      booktitle: props.chapterTitle,
+      chapterNumber: props.chapterNumber,
+    });
+  };
   return (
     <TouchableOpacity
+      onPress={handleChapterPress}
       style={{
         backgroundColor: 'transparent',
         width: '100%',

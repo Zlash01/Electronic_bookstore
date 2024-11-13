@@ -26,67 +26,6 @@ import {getSingleBookData} from '../../api/apiController';
 import {get} from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import Loading from '../loading/loading';
 
-// dummy data from api
-const dummyData = {
-  imageLink: 'https://i.postimg.cc/8ckPPDky/image-1.png',
-  title: 'The Combat Baker And Automation Waitress',
-  author: 'SOW',
-  authorId: 1,
-  authorImage: 'https://i.postimg.cc/jq1v1hhR/image.png',
-  description:
-    "The former soldier of the Principality of Wiltia moves to a rural town to open a bakery. While he has no problem baking delicious bread, this battle-scarred veteran discovers that his intimidating demeanor is scaring off potential customers. Just when he's ready to give up, Sven walked into his shop to ask for a job of a waitress. Could hiring her save his bakery? Just whoo is this beautiful Just who is this beautiful girl? Is she even human?!",
-  totalChapter: 10,
-  totalView: 1000,
-  totalVote: 50,
-  totalVoteRecommended: 30,
-  tags: ['Action', 'Adventure', 'Comedy', 'Fantasy', 'Romance'],
-  parts: [
-    {
-      idParts: 1,
-      title:
-        'a silent hill ncipality of Wiltia moves to a rural town to open a bakery. Whil',
-      chapter: 1,
-    },
-    {idParts: 2, title: 'a good night sleep', chapter: 2},
-    {idParts: 3, title: 'a soothing voice', chapter: 3},
-    {idParts: 4, title: 'a red field', chapter: 4},
-    {idParts: 5, title: 'a bakery', chapter: 5},
-    {idParts: 6, title: 'a small house', chapter: 6},
-  ],
-  similarStories: [
-    {
-      idBooks: 1,
-      imageLink: 'https://i.postimg.cc/8ckPPDky/image-1.png',
-      title: 'Similar Book 1',
-      author: 'Jane Smith',
-    },
-    {
-      idBooks: 2,
-      imageLink: 'https://i.postimg.cc/8ckPPDky/image-1.png',
-      title: 'Similar Book 2',
-      author: 'Bob Johnson',
-    },
-    {
-      idBooks: 3,
-      imageLink: 'https://i.postimg.cc/8ckPPDky/image-1.png',
-      title: 'Similar Book 3',
-      author: 'Alice Johnson',
-    },
-    {
-      idBooks: 4,
-      imageLink: 'https://i.postimg.cc/8ckPPDky/image-1.png',
-      title: 'Similar Book 4',
-      author: 'David Smith',
-    },
-    {
-      idBooks: 5,
-      imageLink: 'https://i.postimg.cc/8ckPPDky/image-1.png',
-      title: 'Similar Book 5',
-      author: 'Emily Davis',
-    },
-  ],
-};
-
 //dummy review data
 const reviews = [
   {
@@ -140,7 +79,7 @@ const reviews = [
     ReviewVoteUp: 9,
   },
 ];
-
+//dummy data
 const similarStories = [
   {
     idBooks: 1,
@@ -200,9 +139,6 @@ const BookDetail = ({navigation, route}) => {
     getBookData();
   }, [idBooks]);
 
-  // get book detail from api
-  const bookDetail = dummyData;
-
   //functions
   const rcmPercentage = (totalVoteRecommended, totalVote) => {
     return totalVote > 0 ? (totalVoteRecommended / totalVote) * 100 : 0;
@@ -233,15 +169,20 @@ const BookDetail = ({navigation, route}) => {
       .map((part, index) => (
         <IndividualChapter
           key={index}
-          chapterId={part.idParts}
+          chapterId={part._id}
           chapterTitle={part.title}
-          chapterDate={part.createdAt}
-          chapterNumber={part.chapter}
+          chapterDate={new Date(part.createdAt).toLocaleDateString()}
+          chapterNumber={index + 1}
         />
       ));
   };
 
   const InfoBlockComponent = props => {
+    // Return null if text prop is empty or undefined
+    if (!props.text || props.text.trim() === '') {
+      return null;
+    }
+
     const [expanded, setExpanded] = useState(false);
 
     const toggleExpand = () => {
@@ -252,8 +193,8 @@ const BookDetail = ({navigation, route}) => {
       <View
         style={{
           flexDirection: 'row',
-          paddingTop: props.paddingTop,
-          paddingBottom: props.paddingBottom,
+          paddingTop: props.paddingTop || 0, // Default to 0 if paddingTop is not provided
+          paddingBottom: props.paddingBottom || 0, // Default to 0 if paddingBottom is not provided
         }}>
         <Text
           style={{
@@ -264,7 +205,8 @@ const BookDetail = ({navigation, route}) => {
             fontSize: 16,
             color: '#f8f8f8',
           }}>
-          {props.title}
+          {props.title || ''}{' '}
+          {/* Default to empty string if title is not provided */}
         </Text>
 
         <Text
@@ -280,7 +222,7 @@ const BookDetail = ({navigation, route}) => {
           {expanded ? props.text : limit(props.text, 200)}
         </Text>
 
-        {props.text.length && props.text.length > 200 && (
+        {props.text.length > 200 && (
           <TouchableOpacity
             onPress={toggleExpand}
             style={{
@@ -414,7 +356,11 @@ const BookDetail = ({navigation, route}) => {
             marginTop: 30,
           }}>
           <Image
-            source={{uri: bookData.coverImage}}
+            source={
+              bookData.coverImage
+                ? {uri: bookData.coverImage}
+                : require('../../assets/picture/universal/R.png')
+            }
             style={{height: 200, width: 150}}
             resizeMode="contain"
           />
@@ -641,7 +587,7 @@ const BookDetail = ({navigation, route}) => {
                 fontSize: 16,
                 color: '#D2CEDC',
               }}>
-              CUSTOMER REVIEWS FOR {bookDetail.title.toUpperCase()}
+              CUSTOMER REVIEWS FOR {bookData.title.toUpperCase()}
             </Text>
             <View
               style={{
@@ -651,9 +597,8 @@ const BookDetail = ({navigation, route}) => {
                 marginTop: 10,
               }}>
               <Text style={{color: '#BABABA'}}>
-                {bookDetail.totalVoteRecommended} recommended out of{' '}
-                {bookDetail.totalVote} reviews (
-                {(bookDetail.totalVoteRecommended / bookDetail.totalVote) * 100}
+                {bookData.positiveVote} recommended out of {bookData.votes}{' '}
+                reviews ({(bookData.positiveVote / bookData.votes) * 100}
                 %)
               </Text>
               <TouchableOpacity>

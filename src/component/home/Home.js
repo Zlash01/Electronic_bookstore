@@ -19,8 +19,10 @@ import AccountDefault from '../../assets/svg/home/account_circle.svg';
 import {getTrendingBooks} from '../../api/apiController';
 import BigStoryCard from './Util/BigStoryCard';
 import ContinueCard from './Util/ContinueCard';
+import {useNavigation} from '@react-navigation/native';
 
 const Header = () => {
+  const navigation = useNavigation();
   return (
     <View
       style={{
@@ -38,6 +40,10 @@ const Header = () => {
         <LogoLight width={WIDTH * 0.13} height={HEIGHT * 0.07} />
       </View>
       <TouchableOpacity
+        onPress={() => {
+          console.log('Search Pressed');
+          navigation.navigate('Search');
+        }}
         style={{
           flex: 3,
           backgroundColor: '#002B3A',
@@ -112,7 +118,7 @@ const BigStoryCardList = ({headerCard, subHeader}) => {
     return (
       <BigStoryCard
         title={item.title}
-        authorId={item.authorId}
+        authorName={item.authorName}
         idBooks={item._id}
         imageLink={item.coverImage}
         description={item.plot}

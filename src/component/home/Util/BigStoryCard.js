@@ -7,7 +7,7 @@ const BigStoryCard = props => {
   const navigation = useNavigation();
 
   //extract props
-  const {title, description, imageLink, authorId} = props;
+  const {title, description, imageLink, authorName} = props;
   // console.log('BigStoryCard:', props);
 
   //limit number of words in title and description and replace the rest with '...'
@@ -78,7 +78,7 @@ const BigStoryCard = props => {
                 fontSize: 14,
                 fontFamily: 'Poppins-Medium',
               }}>
-              Author: User@{authorId}
+              Author: {authorName}
             </Text>
           </View>
         </View>

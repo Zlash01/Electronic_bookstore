@@ -5,6 +5,7 @@ import BookDetail from '../component/bookDetail/BookDetail';
 import Chapters from '../component/bookDetail/Chapters.js';
 import UserReviews from '../component/bookDetail/UserReviews.js';
 import Read from '../component/read/Read.js';
+import SearchScreen from '../component/search/Search.js';
 
 const HomeScreen = Home;
 const DetailScreen = BookDetail;
@@ -29,6 +30,7 @@ const HomeStackNavigator = () => {
           tabBarStyle: {display: 'none'},
         }}
       />
+      <HomeStack.Screen name="Search" component={SearchScreen} />
     </HomeStack.Navigator>
   );
 };

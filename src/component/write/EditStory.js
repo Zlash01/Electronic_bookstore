@@ -16,6 +16,7 @@ import storage from '@react-native-firebase/storage';
 import {updateBook} from '../../api/apiController';
 import Add from '../../assets/svg/write/add.svg';
 import {useNavigation} from '@react-navigation/native';
+import {createChapter} from '../../api/apiController';
 
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
@@ -264,8 +265,112 @@ const Tag = ({tags, setTags}) => {
   );
 };
 
+const ChapterItem = ({chapter, navigation}) => {
+  return (
+    <TouchableOpacity
+      onPress={() => navigation.navigate('CreateChapter', {response: chapter})}
+      style={{
+        paddingHorizontal: WIDTH * 0.03,
+        marginHorizontal: WIDTH * 0.03,
+        paddingTop: 10,
+        paddingBottom: 5,
+        borderBottomWidth: 1,
+        borderBottomColor: '#323232',
+      }}>
+      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+        <View style={{flex: 1}}>
+          <Text
+            style={{
+              color: '#c4c4c4',
+              fontSize: 16,
+              fontFamily: 'Poppins-Medium',
+              marginBottom: 5,
+            }}>
+            Chapter {chapter.chapterNumber || ''}
+          </Text>
+          <Text
+            numberOfLines={1}
+            style={{
+              color: '#989898',
+              fontSize: 14,
+              fontFamily: 'Poppins-Regular',
+            }}>
+            {chapter.content || 'No content'}
+          </Text>
+        </View>
+        <Text
+          style={{
+            color: '#989898',
+            fontSize: 12,
+            fontFamily: 'Poppins-Regular',
+          }}>
+          {new Date(chapter.createdAt).toLocaleDateString()}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const Chapters = ({chapters, navigation, bookId}) => {
+  const handleAddChapter = async () => {
+    try {
+      const response = await createChapter(bookId);
+      if (response.status === 201) {
+        navigation.navigate('CreateChapter', {
+          response: response.data,
+        });
+      } else {
+        Alert.alert('Error', 'Failed to create chapter');
+      }
+    } catch (error) {
+      console.error('Error creating chapter:', error);
+      Alert.alert('Error', 'Failed to create chapter: ' + error.message);
+    }
+  };
+
+  return (
+    <View style={{marginTop: 30}}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingHorizontal: WIDTH * 0.03,
+          marginBottom: 10,
+        }}>
+        <Text
+          style={{
+            color: '#f8f8f8',
+            fontSize: 18,
+            fontFamily: 'Poppins-Medium',
+          }}>
+          Chapters
+        </Text>
+        <TouchableOpacity
+          onPress={handleAddChapter}
+          style={{
+            padding: 5,
+          }}>
+          <Add width={24} height={24} />
+        </TouchableOpacity>
+      </View>
+
+      {chapters?.map((chapter, index) => (
+        <ChapterItem
+          key={chapter._id || index}
+          chapter={chapter}
+          navigation={navigation}
+        />
+      ))}
+    </View>
+  );
+};
+
 const EditStory = ({navigation, route}) => {
   const {data} = route.params;
+  // useEffect(() => {
+  //   console.log('data', data);
+  // }, [data]);
 
   const id = data._id;
   const [title, setTitle] = React.useState(data.title ? data.title : '');
@@ -298,7 +403,8 @@ const EditStory = ({navigation, route}) => {
   }, [navigation, title, description, storyCover, tags]);
 
   return (
-    <SafeAreaView style={{flex: 1, backgroundColor: '#00171F'}}>
+    <SafeAreaView
+      style={{flex: 1, backgroundColor: '#00171F', paddingBottom: 20}}>
       <ScrollView>
         <StoryCover storyCover={storyCover} setStoryCover={setStoryCover} />
         <View style={{height: 30}} />
@@ -319,6 +425,11 @@ const EditStory = ({navigation, route}) => {
             />
             <View style={{height: 30}} />
             <Tag tags={tags} setTags={setTags} />
+            <Chapters
+              chapters={data.chapters}
+              navigation={navigation}
+              bookId={data._id}
+            />
           </KeyboardAvoidingView>
         </View>
       </ScrollView>
