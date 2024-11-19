@@ -647,3 +647,115 @@ export const getSingleChapter = async chapterId => {
     throw error;
   }
 };
+
+export const searchBooks = async (query = '', tag = '', page, limit) => {
+  const {accessToken} = useAuthStore.getState();
+  console.log('Access token:', accessToken);
+  if (!accessToken) {
+    const {logout} = useAuthStore.getState();
+    console.error('Access token is null');
+    AsyncStorage.removeItem('refreshToken');
+    logout();
+    return;
+  }
+  try {
+    const response = await axios.get(
+      `http://${IP}/api/book/getAllBooks?keyword=${query}&tag=${tag}&page=${page}&limit=${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        timeout: 5000,
+      },
+    );
+    return {status: response.status, data: response.data};
+  } catch (error) {
+    if (error.response) {
+      console.error('Server error:', error.response.status);
+      console.log('Error:', error.response.data);
+    } else if (error.request) {
+      console.error(
+        'No response received, server may be down or unreachable:',
+        error.request,
+      );
+    } else {
+      console.error('Error:', error.message);
+    }
+    throw error;
+  }
+};
+
+export const searchBooksByTag = async (tag, page = 1, limit = 10) => {
+  const {accessToken} = useAuthStore.getState();
+  console.log('Access token:', accessToken);
+
+  if (!accessToken) {
+    const {logout} = useAuthStore.getState();
+    console.error('Access token is null');
+    AsyncStorage.removeItem('refreshToken');
+    logout();
+    return;
+  }
+
+  try {
+    const response = await axios.get(
+      `http://${IP}/api/book/getAllBooks?keyword=&tags=${tag}&page=${page}&limit=${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        timeout: 5000,
+      },
+    );
+    return {status: response.status, data: response.data};
+  } catch (error) {
+    if (error.response) {
+      console.error('Server error:', error.response.status);
+      console.log('Error:', error.response.data);
+    } else if (error.request) {
+      console.error(
+        'No response received, server may be down or unreachable:',
+        error.request,
+      );
+    } else {
+      console.error('Error:', error.message);
+    }
+    throw error;
+  }
+};
+
+export const getRandomBooks = async (page, limit) => {
+  const {accessToken} = useAuthStore.getState();
+  console.log('Access token:', accessToken);
+  if (!accessToken) {
+    const {logout} = useAuthStore.getState();
+    console.error('Access token is null');
+    AsyncStorage.removeItem('refreshToken');
+    logout();
+    return;
+  }
+  try {
+    const response = await axios.get(
+      `http://${IP}/api/book/getRandomBooks?page=${page}&limit=${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        timeout: 5000,
+      },
+    );
+    return {status: response.status, data: response.data};
+  } catch (error) {
+    if (error.response) {
+      console.error('Server error:', error.response.status);
+    } else if (error.request) {
+      console.error(
+        'No response received, server may be down or unreachable:',
+        error.request,
+      );
+    } else {
+      console.error('Error:', error.message);
+    }
+    throw error;
+  }
+};

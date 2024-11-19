@@ -6,6 +6,8 @@ import Chapters from '../component/bookDetail/Chapters.js';
 import UserReviews from '../component/bookDetail/UserReviews.js';
 import Read from '../component/read/Read.js';
 import SearchScreen from '../component/search/Search.js';
+import {SearchResultsScreen} from '../component/search/SearchResults.js';
+import {CategoryScreen} from '../component/search/SearchResults.js';
 
 const HomeScreen = Home;
 const DetailScreen = BookDetail;
@@ -31,6 +33,8 @@ const HomeStackNavigator = () => {
         }}
       />
       <HomeStack.Screen name="Search" component={SearchScreen} />
+      <HomeStack.Screen name="SearchResults" component={SearchResultsScreen} />
+      <HomeStack.Screen name="CategoryBooks" component={CategoryScreen} />
     </HomeStack.Navigator>
   );
 };

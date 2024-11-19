@@ -16,7 +16,7 @@ import LogoLight from '../../assets/svg/home/logoLight.svg';
 import SearchIcon from '../../assets/svg/home/search.svg';
 import Tune from '../../assets/svg/home/tune.svg';
 import AccountDefault from '../../assets/svg/home/account_circle.svg';
-import {getTrendingBooks} from '../../api/apiController';
+import {getRandomBooks, getTrendingBooks} from '../../api/apiController';
 import BigStoryCard from './Util/BigStoryCard';
 import ContinueCard from './Util/ContinueCard';
 import {useNavigation} from '@react-navigation/native';

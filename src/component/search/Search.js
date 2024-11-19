@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -7,14 +7,16 @@ import {
   ScrollView,
   StyleSheet,
   Dimensions,
-  Pressable,
+  Alert,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-
-// Import icons from lucide-react-native
-import {ArrowLeft, Search, Clock, ArrowUpRight} from 'lucide-react-native';
+import {ArrowLeft, Search, Clock, ArrowUpRight, X} from 'lucide-react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const {width} = Dimensions.get('window');
+
+const SEARCH_HISTORY_KEY = '@search_history';
+const MAX_HISTORY_ITEMS = 10;
 
 const categories = [
   'Adventure',
@@ -29,32 +31,94 @@ const categories = [
 const SearchScreen = () => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchHistory] = useState([
-    'Search history 1',
-    'Search history 1',
-    'Search history 1',
-    'Search history 1',
-  ]);
+  const [searchHistory, setSearchHistory] = useState([]);
 
-  // Calculate grid layout
   const numColumns = 2;
   const spacing = 16;
   const itemWidth = (width - spacing * (numColumns + 1)) / numColumns;
 
-  const handleCategoryPress = category => {
-    // Navigate to category screen
-    console.log(`Navigate to ${category} category`);
-    // Add your navigation logic here
+  // Load search history when component mounts
+  useEffect(() => {
+    loadSearchHistory();
+  }, []);
+
+  // Function to load search history from AsyncStorage
+  const loadSearchHistory = async () => {
+    try {
+      const history = await AsyncStorage.getItem(SEARCH_HISTORY_KEY);
+      if (history !== null) {
+        setSearchHistory(JSON.parse(history));
+      }
+    } catch (error) {
+      console.error('Error loading search history:', error);
+      Alert.alert('Error', 'Failed to load search history');
+    }
   };
 
-  const handleHistoryPress = searchTerm => {
-    console.log(`Search for ${searchTerm}`);
-    // Add your search logic here
+  // Function to save search history to AsyncStorage
+  const saveSearchHistory = async newHistory => {
+    try {
+      await AsyncStorage.setItem(
+        SEARCH_HISTORY_KEY,
+        JSON.stringify(newHistory),
+      );
+    } catch (error) {
+      console.error('Error saving search history:', error);
+      Alert.alert('Error', 'Failed to save search history');
+    }
+  };
+
+  // Function to add new search term to history
+  const addToSearchHistory = async term => {
+    if (!term.trim()) return;
+
+    const newHistory = [
+      term,
+      ...searchHistory.filter(item => item !== term), // Remove duplicates
+    ].slice(0, MAX_HISTORY_ITEMS); // Keep only the most recent items
+
+    setSearchHistory(newHistory);
+    await saveSearchHistory(newHistory);
+  };
+
+  // Function to remove item from search history
+  const removeFromHistory = async termToRemove => {
+    const newHistory = searchHistory.filter(term => term !== termToRemove);
+    setSearchHistory(newHistory);
+    await saveSearchHistory(newHistory);
+  };
+
+  // Function to clear all search history
+  const clearSearchHistory = async () => {
+    try {
+      await AsyncStorage.removeItem(SEARCH_HISTORY_KEY);
+      setSearchHistory([]);
+    } catch (error) {
+      console.error('Error clearing search history:', error);
+      Alert.alert('Error', 'Failed to clear search history');
+    }
+  };
+
+  const handleSearch = async query => {
+    if (query.trim()) {
+      await addToSearchHistory(query);
+      console.log('Search for:', query);
+      navigation.navigate('SearchResults', {query});
+    }
+  };
+
+  const handleCategoryPress = category => {
+    navigation.navigate('CategoryBooks', {category});
+  };
+
+  const handleHistoryPress = async searchTerm => {
+    setSearchQuery(searchTerm);
+    await addToSearchHistory(searchTerm);
+    navigation.navigate('SearchResults', {query: searchTerm});
   };
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <ArrowLeft color="#f8f8f8" size={24} />
@@ -66,13 +130,16 @@ const SearchScreen = () => {
             placeholderTextColor="#989898"
             value={searchQuery}
             onChangeText={setSearchQuery}
+            onSubmitEditing={() => handleSearch(searchQuery)}
+            returnKeyType="search"
           />
-          <Search color="#989898" size={20} style={styles.searchIcon} />
+          <TouchableOpacity onPress={() => handleSearch(searchQuery)}>
+            <Search color="#989898" size={20} style={styles.searchIcon} />
+          </TouchableOpacity>
         </View>
       </View>
 
       <ScrollView style={styles.content}>
-        {/* Categories Section */}
         <Text style={styles.sectionTitle}>Browse Category</Text>
         <View style={styles.categoriesGrid}>
           {categories.map((category, index) => (
@@ -85,10 +152,18 @@ const SearchScreen = () => {
           ))}
         </View>
 
-        {/* Search History */}
+        {searchHistory.length > 0 && (
+          <View style={styles.historyHeader}>
+            <Text style={styles.historySectionTitle}>Recent Searches</Text>
+            <TouchableOpacity onPress={clearSearchHistory}>
+              <Text style={styles.clearHistoryText}>Clear All</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         <View style={styles.historyContainer}>
           {searchHistory.map((item, index) => (
-            <Pressable
+            <TouchableOpacity
               key={index}
               style={styles.historyItem}
               onPress={() => handleHistoryPress(item)}>
@@ -96,8 +171,12 @@ const SearchScreen = () => {
                 <Clock color="#989898" size={20} />
                 <Text style={styles.historyText}>{item}</Text>
               </View>
-              <ArrowUpRight color="#989898" size={20} />
-            </Pressable>
+              <TouchableOpacity
+                onPress={() => removeFromHistory(item)}
+                style={styles.removeButton}>
+                <X color="#989898" size={20} />
+              </TouchableOpacity>
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
@@ -128,7 +207,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   searchIcon: {
-    marginRight: 8,
+    marginLeft: 8,
   },
   searchInput: {
     flex: 1,
@@ -165,6 +244,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Poppins-Medium',
   },
+  historyHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  historySectionTitle: {
+    fontSize: 18,
+    fontFamily: 'Poppins-Medium',
+    color: '#f8f8f8',
+  },
+  clearHistoryText: {
+    color: '#D24E37',
+    fontSize: 14,
+    fontFamily: 'Poppins-Medium',
+  },
   historyContainer: {
     gap: 16,
   },
@@ -178,11 +273,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    flex: 1,
   },
   historyText: {
     color: '#989898',
     fontSize: 16,
     fontFamily: 'Poppins-Regular',
+    flex: 1,
+  },
+  removeButton: {
+    padding: 4,
   },
 });
 

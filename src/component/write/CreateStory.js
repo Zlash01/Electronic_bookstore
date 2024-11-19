@@ -17,6 +17,7 @@ import {createBook, createChapter} from '../../api/apiController';
 
 import Add from '../../assets/svg/write/add.svg';
 import {useNavigation} from '@react-navigation/native';
+import LoadingCard from '../loading/loadingCard';
 
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
@@ -137,8 +138,16 @@ const StoryCover = props => {
   );
 };
 
-const ProceedButton = ({title = '', description = '', cover = ''}) => {
-  const navigation = useNavigation(); // Move this up to the top
+const ProceedButton = ({
+  title = '',
+  description = '',
+  cover = '',
+  loading,
+  setLoading,
+  loadingText,
+  setLoadingText,
+}) => {
+  const navigation = useNavigation();
   const [text, setText] = useState('Skip');
 
   function isLocalImage(uri) {
@@ -156,6 +165,7 @@ const ProceedButton = ({title = '', description = '', cover = ''}) => {
 
     try {
       console.log('Uploading image:', imageUri);
+      setLoadingText('Uploading cover image...');
 
       const task = reference.putFile(imageUri);
 
@@ -164,6 +174,7 @@ const ProceedButton = ({title = '', description = '', cover = ''}) => {
         const progress =
           (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) * 100;
         console.log(`Upload is ${progress}% done`);
+        setLoadingText(`Uploading cover image... ${Math.round(progress)}%`);
       });
 
       await task;
@@ -174,6 +185,7 @@ const ProceedButton = ({title = '', description = '', cover = ''}) => {
       console.error('Upload Error:', error);
       console.error('Upload Error Message:', error.message);
       Alert.alert(error.message);
+      throw error;
     }
   };
 
@@ -191,13 +203,17 @@ const ProceedButton = ({title = '', description = '', cover = ''}) => {
 
   const handleCreation = async () => {
     try {
+      setLoading(true);
       // Handle book creation
       console.log('Creating story:', title, description, cover);
       let bookResponse;
+
       if (cover && isLocalImage(cover)) {
         const url = await uploadImage(cover);
+        setLoadingText('Creating story...');
         bookResponse = await createBook(title, description, url);
       } else {
+        setLoadingText('Creating story...');
         bookResponse = await createBook(title, description, cover);
       }
 
@@ -211,6 +227,7 @@ const ProceedButton = ({title = '', description = '', cover = ''}) => {
 
       // Handle chapter creation separately
       try {
+        setLoadingText('Creating first chapter...');
         const chapterResponse = await createChapter(bookResponse.data._id);
         if (chapterResponse.status === 201) {
           console.log('Chapter creation successful:', chapterResponse.data);
@@ -232,12 +249,20 @@ const ProceedButton = ({title = '', description = '', cover = ''}) => {
     } catch (error) {
       console.error('Error creating story:', error);
       Alert.alert('Error', 'Failed to create story: ' + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <TouchableOpacity onPress={handleCreation}>
-      <Text style={{color: '#f8f8f8', fontWeight: '500', fontSize: 16}}>
+    <TouchableOpacity onPress={handleCreation} disabled={loading}>
+      <Text
+        style={{
+          color: '#f8f8f8',
+          fontWeight: '500',
+          fontSize: 16,
+          opacity: loading ? 0.5 : 1,
+        }}>
         {text}
       </Text>
     </TouchableOpacity>
@@ -248,6 +273,8 @@ const CreateStory = ({navigation, route}) => {
   const [title, setTitle] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [storyCover, setStoryCover] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [loadingText, setLoadingText] = React.useState('Creating story...');
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -258,11 +285,15 @@ const CreateStory = ({navigation, route}) => {
             title={title}
             description={description}
             cover={storyCover}
+            loading={loading}
+            setLoading={setLoading}
+            loadingText={loadingText}
+            setLoadingText={setLoadingText}
           />
         );
       },
     });
-  }, [navigation, title, description, storyCover]);
+  }, [navigation, title, description, storyCover, loading, loadingText]);
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: '#00171F'}}>
@@ -287,6 +318,7 @@ const CreateStory = ({navigation, route}) => {
           </KeyboardAvoidingView>
         </View>
       </ScrollView>
+      {loading && <LoadingCard loadingText={loadingText} />}
     </SafeAreaView>
   );
 };
