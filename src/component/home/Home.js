@@ -74,13 +74,14 @@ const Header = () => {
           </Text>
         </View>
       </TouchableOpacity>
-      <View
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Settings')}
         style={{
           flex: 1,
           alignItems: 'center',
         }}>
         <Tune width={WIDTH * 0.1} height={HEIGHT * 0.07} />
-      </View>
+      </TouchableOpacity>
       <View
         style={{
           flex: 1,

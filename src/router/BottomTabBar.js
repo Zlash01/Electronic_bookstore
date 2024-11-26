@@ -114,7 +114,7 @@ function Main() {
           headerShown: false,
         }}
       />
-      <Tab.Screen name="ProfileStack" component={ProfileScreen} />
+      {/* <Tab.Screen name="ProfileStack" component={ProfileScreen} /> */}
     </Tab.Navigator>
   );
 }

@@ -270,7 +270,7 @@ const BookDetail = ({navigation, route}) => {
 
   const SimilarStories = ({data}) => {
     // Extract the randomBooks array from the API response
-    console.log('Similar Stories:', data);
+    // console.log('Similar Stories:', data);
     const similarStories = data.randomBooks.map(book => ({
       imageLink: book.coverImage,
       title: book.title,
