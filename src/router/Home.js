@@ -2,8 +2,8 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
 import Home from '../component/home/Home.js';
 import BookDetail from '../component/bookDetail/BookDetail';
-import Chapters from '../component/bookDetail/Chapters.js';
-import UserReviews from '../component/bookDetail/UserReviews.js';
+import ChapterList from '../component/bookDetail/ChapterList.js';
+import ReviewList from '../component/bookDetail/ReviewList.js';
 import Read from '../component/read/Read.js';
 import SearchScreen from '../component/search/Search.js';
 import {SearchResultsScreen} from '../component/search/SearchResults.js';
@@ -11,8 +11,8 @@ import {CategoryScreen} from '../component/search/SearchResults.js';
 
 const HomeScreen = Home;
 const DetailScreen = BookDetail;
-const ChaptersScreen = Chapters;
-const UserReviewsScreen = UserReviews;
+const ChaptersScreen = ChapterList;
+const UserReviewsScreen = ReviewList;
 const ReadScreen = Read;
 
 const HomeStack = createNativeStackNavigator();
@@ -23,8 +23,8 @@ const HomeStackNavigator = () => {
       screenOptions={{headerShown: false}}>
       <HomeStack.Screen name="Home" component={HomeScreen} />
       <HomeStack.Screen name="Detail" component={DetailScreen} />
-      <HomeStack.Screen name="Chapters" component={ChaptersScreen} />
-      <HomeStack.Screen name="UserReviews" component={UserReviewsScreen} />
+      <HomeStack.Screen name="ChapterList" component={ChaptersScreen} />
+      <HomeStack.Screen name="ReviewList" component={UserReviewsScreen} />
       <HomeStack.Screen
         name="Read"
         component={ReadScreen}

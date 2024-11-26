@@ -166,9 +166,9 @@ const BookDetail = ({navigation, route}) => {
           key={index}
           chapterId={part._id}
           chapterTitle={part.title}
-          bookId={idBooks}
+          bookId={part.book}
           chapterDate={new Date(part.createdAt).toLocaleDateString()}
-          chapterNumber={index + 1}
+          chapterNumber={part.chapterNumber}
         />
       ));
   };
@@ -552,7 +552,11 @@ const BookDetail = ({navigation, route}) => {
                 Parts
               </Text>
             </View>
-            <TouchableOpacity style={{alignSelf: 'center'}}>
+            <TouchableOpacity
+              style={{alignSelf: 'center'}}
+              onPress={() =>
+                navigation.navigate('ChapterList', {data: bookData.chapters})
+              }>
               <Text
                 style={{
                   fontSize: 16,
@@ -599,7 +603,10 @@ const BookDetail = ({navigation, route}) => {
                   {(bookData.positiveVotes / bookData.totalVotes) * 100}
                   %)
                 </Text>
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('ReviewList', {data: reviews})
+                  }>
                   <Text
                     style={{
                       color: '#D24E37',
