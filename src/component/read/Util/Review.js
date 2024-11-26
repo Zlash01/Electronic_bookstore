@@ -10,6 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import {ThumbsUp, ThumbsDown} from 'lucide-react-native';
+import {createReview} from '../../../api/apiController';
 
 const ReviewModal = ({visible, onClose, bookId}) => {
   const [isRecommended, setIsRecommended] = useState(null);
@@ -24,22 +25,35 @@ const ReviewModal = ({visible, onClose, bookId}) => {
 
     setIsLoading(true);
     try {
-      // Dummy API call - replace with actual API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      // await userReview(bookId, isRecommended, reviewText);
-
-      Alert.alert('Success', 'Thank you for your review!', [
-        {
-          text: 'OK',
-          onPress: () => {
-            setReviewText('');
-            setIsRecommended(null);
-            onClose();
-          },
-        },
-      ]);
+      await createReview(bookId, isRecommended, reviewText)
+        .then(res => {
+          if (res.status === 201) {
+            console.log('Review created');
+            Alert.alert('Success', 'Thank you for your review!', [
+              {
+                text: 'OK',
+                onPress: () => {
+                  setReviewText('');
+                  setIsRecommended(null);
+                  onClose();
+                },
+              },
+            ]);
+          } else {
+            Alert.alert(
+              'Error',
+              'Failed to submit review, status code: ' + res.status,
+            );
+          }
+        })
+        .catch(error => {
+          Alert.alert('Error', 'Failed to submit review. Error ' + error);
+        });
     } catch (error) {
-      Alert.alert('Error', 'Failed to submit review. Please try again.');
+      Alert.alert(
+        'Error',
+        'Failed to submit review. Please try again. Error: ' + error,
+      );
     } finally {
       setIsLoading(false);
     }

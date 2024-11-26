@@ -12,7 +12,8 @@ import FontSettingsModal from './Util/FontSetting';
 import ThemeSettingsModal from './Util/ThemeSetting';
 import ReviewModal from './Util/Review';
 import Loading from '../loading/loading';
-import {getSingleChapter} from '../../api/apiController';
+import {getSingleChapter, hasReviewed} from '../../api/apiController';
+import {increaseViewCount} from '../../api/apiController';
 
 const {width, height} = Dimensions.get('window');
 
@@ -28,7 +29,14 @@ const TopBar = ({title, onBack}) => (
   </View>
 );
 
-const BottomBar = ({scrollPercentage, onSeek, onFontPress, onThemePress}) => (
+const BottomBar = ({
+  scrollPercentage,
+  onSeek,
+  onFontPress,
+  onThemePress,
+  onReviewPress,
+  hasReview,
+}) => (
   <View style={styles.bottomBar}>
     {/* Seekbar */}
     <View style={styles.seekbarContainer}>
@@ -42,9 +50,14 @@ const BottomBar = ({scrollPercentage, onSeek, onFontPress, onThemePress}) => (
     {/* Bottom icons */}
     <View style={styles.bottomIcons}>
       <TouchableOpacity
-        onPress={() => console.log('Review')}
-        style={styles.iconButton}>
-        <Star stroke="#f8f8f8" size={24} />
+        onPress={onReviewPress}
+        style={styles.iconButton}
+        disabled={hasReview}>
+        {hasReview ? (
+          <Star stroke="#EB5E28" fill={'#EB5E28'} size={24} />
+        ) : (
+          <Star stroke="#f8f8f8" size={24} />
+        )}
       </TouchableOpacity>
       <TouchableOpacity onPress={onFontPress} style={styles.iconButton}>
         <Type stroke="#f8f8f8" size={24} />
@@ -63,7 +76,7 @@ const BottomBar = ({scrollPercentage, onSeek, onFontPress, onThemePress}) => (
 
 const Read = ({navigation, route}) => {
   useEffect(() => {
-    console.log('check data from route', route.params);
+    console.log('check data Read.js', route.params);
   }, []);
   const [loading, setLoading] = useState(false);
   const [scrollPercentage, setScrollPercentage] = useState(0);
@@ -82,27 +95,89 @@ const Read = ({navigation, route}) => {
     title: 'Title',
     content: 'Content',
   });
+  const [reviewSettingsVisible, setReviewSettingsVisible] = useState(false);
+  const [hasReview, setHasReview] = useState(false);
+  const handleReviewOnClose = () => {
+    setReviewSettingsVisible(false);
+    setHasReview(true);
+  };
 
   useEffect(() => {
-    setLoading(true);
-    getSingleChapter(route.params.idChapter)
-      .then(res => {
-        // console.log('check data from getSingleChapter', res);
-        setData({
-          title: res.data.title,
-          content: res.data.content,
-        });
-      })
-      .finally(() => {
-        setLoading(false);
-      })
-      .catch(err => {
-        console.log('error getSingleChapter', err);
-      });
-  }, [route.params.idChapter]);
-  // useEffect(() => {
-  //   console.log('check data from data', data);
-  // }, [data]);
+    let isMounted = true; // For cleanup/prevent memory leaks
+
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        // Run both requests concurrently using Promise.all
+        const [chapterResponse, reviewResponse] = await Promise.all([
+          getSingleChapter(route.params.idChapter),
+          hasReviewed(route.params.bookId),
+        ]);
+
+        // Only update state if component is still mounted
+        if (isMounted) {
+          setData({
+            title: chapterResponse.data.title,
+            content: chapterResponse.data.content,
+          });
+          setHasReview(reviewResponse.data.hasReviewed);
+        }
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        // You may want to handle errors more gracefully here
+        // e.g. show an error message to user
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+
+    // Cleanup function to handle unmounting
+    return () => {
+      isMounted = false;
+    };
+  }, [route.params.idChapter, route.params.bookId]); // Include both dependencies
+
+  const [viewCounted, setViewCounted] = useState(false);
+  const readingTimer = useRef(null);
+  const startTime = useRef(null);
+
+  // Function to handle effective view
+  const handleEffectiveView = async () => {
+    if (viewCounted) return; // Prevent multiple view counts
+
+    const currentTime = Date.now();
+    const readingDuration = currentTime - startTime.current;
+
+    // Check if reading time is more than 15 seconds
+    if (readingDuration >= 15000) {
+      try {
+        await increaseViewCount(route.params.bookId);
+        setViewCounted(true); // Mark view as counted
+        if (readingTimer.current) {
+          clearInterval(readingTimer.current); // Clear timer after successful view count
+        }
+        console.log('View count increased successfully');
+      } catch (error) {
+        console.error('Failed to increase view count:', error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    startTime.current = Date.now();
+    readingTimer.current = setInterval(handleEffectiveView, 1000); // Check every second
+
+    return () => {
+      if (readingTimer.current) {
+        clearInterval(readingTimer.current);
+      }
+    };
+  }, []);
 
   const scrollViewRef = useRef(null);
 
@@ -181,6 +256,8 @@ const Read = ({navigation, route}) => {
         onSeek={handleSeek}
         onFontPress={() => setFontSettingsVisible(true)}
         onThemePress={() => setThemeSettingsVisible(true)}
+        onReviewPress={() => setReviewSettingsVisible(true)}
+        hasReview={hasReview}
       />
       <FontSettingsModal
         visible={fontSettingsVisible}
@@ -195,6 +272,11 @@ const Read = ({navigation, route}) => {
         onClose={() => setThemeSettingsVisible(false)}
         currentTheme={currentTheme}
         onThemeChange={handleThemeChange}
+      />
+      <ReviewModal
+        visible={reviewSettingsVisible}
+        onClose={() => handleReviewOnClose()}
+        bookId={route.params.bookId}
       />
     </View>
   );

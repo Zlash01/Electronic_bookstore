@@ -5,13 +5,12 @@ import {useNavigation} from '@react-navigation/native';
 const IndividualChapter = props => {
   const navigation = useNavigation();
 
-  console.log('IndividualChapter', props);
-
   const handleChapterPress = () => {
     navigation.navigate('Read', {
       idChapter: props.chapterId,
       booktitle: props.chapterTitle,
       chapterNumber: props.chapterNumber,
+      bookId: props.bookId,
     });
   };
   return (

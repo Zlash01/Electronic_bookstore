@@ -21,64 +21,13 @@ import LibAdd from '../../assets/svg/bookDetail/library_add.svg';
 import limit from '../../util/limitWord';
 import ReviewCard from './Util/ReviewCard';
 import ArrowBack from '../../assets/svg/universal/arrow_back.svg';
-import {useNavigation} from '@react-navigation/native';
-import {getSingleBookData} from '../../api/apiController';
-import {get} from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+import {
+  addToLibrary,
+  getBookReviews,
+  getSingleBookData,
+} from '../../api/apiController';
 import Loading from '../loading/loading';
 
-//dummy review data
-const reviews = [
-  {
-    Userid: 1,
-    Username: 'John Doe',
-    UserImage: 'https://i.postimg.cc/jq1v1hhR/image.png',
-    Review:
-      'Generating random paragraphs can be an excellent way for writers to get their creative flow going at the beginning of the day. The writer has no idea what topic the random paragraph will be about when it appears. This forces the writer to use creativity to complete one of three common writing challenges. The writer can use the paragraph as the first one of a short story and build upon it. A second option is to use the random paragraph somewhere in a short story they create. The third option is to have the random paragraph be the ending paragraph in a short story. No matter which of these challenges is undertaken, the writer is forced to use creativity to incorporate the paragraph into their writing.',
-    ReviewDate: '2023-10-01',
-    ReviewVote: 10,
-    ReviewVoteUp: 5,
-  },
-  {
-    Userid: 2,
-    Username: 'Jane Smith',
-    UserImage: 'https://i.postimg.cc/jq1v1hhR/image.png',
-    Review:
-      'Using random paragraph generators helps ignite ideas for creative writing. Some writers find it hard to come up with a starting point, and these generators serve as prompts. The user can develop the paragraph into an essay or use it in the middle of their storyline.',
-    ReviewDate: '2023-10-02',
-    ReviewVote: 15,
-    ReviewVoteUp: 8,
-  },
-  {
-    Userid: 3,
-    Username: 'Emily Johnson',
-    UserImage: 'https://i.postimg.cc/jq1v1hhR/image.png',
-    Review:
-      'A random paragraph generator is a useful tool for overcoming writer’s block. It presents an unexpected prompt that pushes a writer’s creativity to explore new directions.',
-    ReviewDate: '2023-09-28',
-    ReviewVote: 12,
-    ReviewVoteUp: 7,
-  },
-  {
-    Userid: 4,
-    Username: 'Michael Brown',
-    UserImage: 'https://i.postimg.cc/jq1v1hhR/image.png',
-    Review:
-      'I’ve used random paragraphs to fuel my brainstorming sessions. It’s interesting how a simple random prompt can kickstart the creation of full-length stories.',
-    ReviewDate: '2023-10-03',
-    ReviewVote: 20,
-    ReviewVoteUp: 11,
-  },
-  {
-    Userid: 5,
-    Username: 'Chris Lee',
-    UserImage: 'https://i.postimg.cc/jq1v1hhR/image.png',
-    Review:
-      'This generator gave me the perfect starting point for my latest short story. I struggled for weeks, but with one random paragraph, everything just clicked into place.',
-    ReviewDate: '2023-09-29',
-    ReviewVote: 18,
-    ReviewVoteUp: 9,
-  },
-];
 //dummy data
 const similarStories = [
   {
@@ -112,32 +61,62 @@ const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
 const BookDetail = ({navigation, route}) => {
-  console.log('Book Detail Params:', route.params);
+  // console.log('Book Detail Params:', route.params);
   const {idBooks} = route.params;
   const [bookData, setBookData] = useState({});
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getBookData = async () => {
+    const fetchData = async () => {
       try {
-        setLoading(true); // Start loading
+        setLoading(true);
 
-        const res = await getSingleBookData(idBooks);
-        if (res.status === 200) {
-          setBookData(res.data);
+        // Fetch both data simultaneously using Promise.all
+        const [bookResponse, reviewsResponse] = await Promise.all([
+          getSingleBookData(idBooks),
+          getBookReviews(idBooks),
+        ]);
+
+        // Handle book data
+        if (bookResponse.status === 200) {
+          // console.log('Book:', bookResponse.data);
+          setBookData(bookResponse.data);
         } else {
-          console.log('Error:', res);
-          Alert.alert('Error', 'Failed to get book data', res.data);
+          console.log('Error:', bookResponse);
+          Alert.alert('Error', 'Failed to get book data', bookResponse.data);
+        }
+
+        // Handle reviews data
+        if (reviewsResponse.status === 200) {
+          const formattedReviews = reviewsResponse.data.allReviewsOfBook.map(
+            review => ({
+              id: review._id,
+              positive: review.positive,
+              Username: review.userId.name,
+              Review: review.review,
+              ReviewDate: review.createdAt,
+            }),
+          );
+          setReviews(formattedReviews);
+        } else {
+          console.log('Error:', reviewsResponse);
+          Alert.alert('Error', 'Failed to get reviews', reviewsResponse.data);
         }
       } catch (error) {
         console.log('Error:', error);
         Alert.alert('Error', 'An unexpected error occurred');
       } finally {
-        setLoading(false); // Stop loading
+        setLoading(false);
       }
     };
-    getBookData();
+
+    fetchData();
   }, [idBooks]);
+
+  useEffect(() => {
+    console.log('Reviews:', reviews);
+  }, [reviews]);
 
   //functions
   const rcmPercentage = (totalVoteRecommended, totalVote) => {
@@ -151,11 +130,27 @@ const BookDetail = ({navigation, route}) => {
     // if added, setAdded to true
   }, []);
 
-  const addToLibrary = () => {
+  const addToLibraryFunc = async () => {
     setLibLoading(true);
-    // api call to add book to library
-    setAdded(!added);
-    setLibLoading(false);
+    console.log('Adding book to library:', idBooks);
+    await addToLibrary(idBooks)
+      .then(res => {
+        if (res.status === 200) {
+          console.log('Success:', res);
+          setAdded(true);
+        } else {
+          console.log('Error:', res);
+          Alert.alert('Error', 'Failed to add book to library', res.data);
+        }
+      })
+      .catch(error => {
+        console.log('Error:', error);
+        Alert.alert('Error', 'An unexpected error occurred');
+      })
+      .finally(() => {
+        setAdded(!added);
+        setLibLoading(false);
+      });
   };
 
   const tagsParser = tags => {
@@ -171,6 +166,7 @@ const BookDetail = ({navigation, route}) => {
           key={index}
           chapterId={part._id}
           chapterTitle={part.title}
+          bookId={idBooks}
           chapterDate={new Date(part.createdAt).toLocaleDateString()}
           chapterNumber={index + 1}
         />
@@ -280,13 +276,11 @@ const BookDetail = ({navigation, route}) => {
     return displayReviews.map((review, index) => (
       <ReviewCard
         key={index}
-        Userid={review.Userid}
+        id={review.id}
         Username={review.Username}
-        UserImage={review.UserImage}
         Review={review.Review}
         ReviewDate={review.ReviewDate}
-        ReviewVote={review.ReviewVote}
-        ReviewVoteUp={review.ReviewVoteUp}
+        isRecommended={review.positive}
       />
     ));
   };
@@ -412,8 +406,8 @@ const BookDetail = ({navigation, route}) => {
           <StatisticComponent
             icon={Star}
             text={`${rcmPercentage(
-              bookData.positiveVote,
-              bookData.totalVote,
+              bookData.positiveVotes,
+              bookData.totalVotes,
             )}%`}
           />
           <StatisticComponent
@@ -441,6 +435,7 @@ const BookDetail = ({navigation, route}) => {
                 idChapter: bookData.chapters[0]._id,
                 bookTitle: bookData.title,
                 chapterNumber: 1,
+                bookId: idBooks,
               })
             }
             style={{
@@ -471,6 +466,7 @@ const BookDetail = ({navigation, route}) => {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
+            onPress={addToLibraryFunc}
             style={{
               flexDirection: 'row',
               justifyContent: 'center',
@@ -574,54 +570,57 @@ const BookDetail = ({navigation, route}) => {
           <RenderParts />
         </View>
         {/* book reviews */}
-        <View
-          style={{
-            backgroundColor: '#011D27',
-            paddingHorizontal: width * 0.02,
-            paddingVertical: height * 0.02,
-          }}>
-          <View style={{}}>
-            <Text
-              style={{
-                fontFamily: 'Poppins-SemiBold',
-                fontSize: 16,
-                color: '#D2CEDC',
-              }}>
-              CUSTOMER REVIEWS FOR {bookData.title.toUpperCase()}
-            </Text>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginTop: 10,
-              }}>
-              <Text style={{color: '#BABABA'}}>
-                {bookData.positiveVote} recommended out of {bookData.votes}{' '}
-                reviews ({(bookData.positiveVote / bookData.votes) * 100}
-                %)
-              </Text>
-              <TouchableOpacity>
-                <Text
-                  style={{
-                    color: '#D24E37',
-                    fontFamily: 'Poppins-SemiBold',
-                    fontSize: 14,
-                    paddingRight: width * 0.02,
-                  }}>
-                  See All
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+        {reviews.length > 0 && (
           <View
             style={{
-              paddingVertical: height * 0.02,
+              backgroundColor: '#011D27',
               paddingHorizontal: width * 0.02,
+              paddingVertical: height * 0.02,
             }}>
-            <ReviewList />
+            <View style={{}}>
+              <Text
+                style={{
+                  fontFamily: 'Poppins-SemiBold',
+                  fontSize: 16,
+                  color: '#D2CEDC',
+                }}>
+                CUSTOMER REVIEWS FOR {bookData.title.toUpperCase()}
+              </Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: 10,
+                }}>
+                <Text style={{color: '#BABABA'}}>
+                  {bookData.positiveVotes} recommended out of{' '}
+                  {bookData.totalVotes} reviews (
+                  {(bookData.positiveVotes / bookData.totalVotes) * 100}
+                  %)
+                </Text>
+                <TouchableOpacity>
+                  <Text
+                    style={{
+                      color: '#D24E37',
+                      fontFamily: 'Poppins-SemiBold',
+                      fontSize: 14,
+                      paddingRight: width * 0.02,
+                    }}>
+                    See All
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View
+              style={{
+                paddingVertical: height * 0.02,
+                paddingHorizontal: width * 0.02,
+              }}>
+              <ReviewList />
+            </View>
           </View>
-        </View>
+        )}
         {/* similar stories */}
         <View
           style={{
