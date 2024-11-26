@@ -24,38 +24,10 @@ import ArrowBack from '../../assets/svg/universal/arrow_back.svg';
 import {
   addToLibrary,
   getBookReviews,
+  getRandomBooks,
   getSingleBookData,
 } from '../../api/apiController';
 import Loading from '../loading/loading';
-
-//dummy data
-const similarStories = [
-  {
-    idBooks: 1,
-    imageLink: 'https://i.postimg.cc/8ckPPDky/image-1.png',
-    title: 'Similar Book 1',
-  },
-  {
-    idBooks: 2,
-    imageLink: 'https://i.postimg.cc/8ckPPDky/image-1.png',
-    title: 'Similar Book 2 long text bla bla bla',
-  },
-  {
-    idBooks: 3,
-    imageLink: 'https://i.postimg.cc/8ckPPDky/image-1.png',
-    title: 'Similar Book 3',
-  },
-  {
-    idBooks: 4,
-    imageLink: 'https://i.postimg.cc/8ckPPDky/image-1.png',
-    title: 'Similar Book 4',
-  },
-  {
-    idBooks: 5,
-    imageLink: 'https://i.postimg.cc/8ckPPDky/image-1.png',
-    title: 'Similar Book 5',
-  },
-];
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
@@ -64,6 +36,7 @@ const BookDetail = ({navigation, route}) => {
   // console.log('Book Detail Params:', route.params);
   const {idBooks} = route.params;
   const [bookData, setBookData] = useState({});
+  const [bookRecommendation, setBookRecommendation] = useState({});
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -73,10 +46,12 @@ const BookDetail = ({navigation, route}) => {
         setLoading(true);
 
         // Fetch both data simultaneously using Promise.all
-        const [bookResponse, reviewsResponse] = await Promise.all([
-          getSingleBookData(idBooks),
-          getBookReviews(idBooks),
-        ]);
+        const [bookResponse, reviewsResponse, bookRecommendationResponse] =
+          await Promise.all([
+            getSingleBookData(idBooks),
+            getBookReviews(idBooks),
+            getRandomBooks(1, 10),
+          ]);
 
         // Handle book data
         if (bookResponse.status === 200) {
@@ -103,6 +78,18 @@ const BookDetail = ({navigation, route}) => {
           console.log('Error:', reviewsResponse);
           Alert.alert('Error', 'Failed to get reviews', reviewsResponse.data);
         }
+
+        if (bookRecommendationResponse.status === 200) {
+          setBookRecommendation(bookRecommendationResponse.data);
+          // console.log('Book Recommendation:', bookRecommendationResponse.data);
+        } else {
+          console.log('Error:', bookRecommendationResponse);
+          Alert.alert(
+            'Error',
+            'Failed to get book recommendation',
+            bookRecommendationResponse.data,
+          );
+        }
       } catch (error) {
         console.log('Error:', error);
         Alert.alert('Error', 'An unexpected error occurred');
@@ -125,10 +112,6 @@ const BookDetail = ({navigation, route}) => {
 
   const [added, setAdded] = React.useState(false);
   const [libLoading, setLibLoading] = React.useState(false);
-  useEffect(() => {
-    // check if book is added to library (api call)
-    // if added, setAdded to true
-  }, []);
 
   const addToLibraryFunc = async () => {
     setLibLoading(true);
@@ -285,21 +268,36 @@ const BookDetail = ({navigation, route}) => {
     ));
   };
 
-  const SimilarStories = () => {
+  const SimilarStories = ({data}) => {
+    // Extract the randomBooks array from the API response
+    console.log('Similar Stories:', data);
+    const similarStories = data.randomBooks.map(book => ({
+      imageLink: book.coverImage,
+      title: book.title,
+      _id: book._id,
+    }));
+
     return (
       <FlatList
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{gap: width * 0.03}}
+        ItemSeparatorComponent={() => <View style={{width: width * 0.01}} />}
         data={similarStories}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({item}) => (
           <TouchableOpacity
+            onPress={() => navigation.navigate('Detail', {idBooks: item._id})}
             style={{
-              alignItems: 'center',
+              // alignItems: 'center',
+              width: width * 0.24,
             }}>
             <Image
-              source={{uri: item.imageLink}}
+              source={
+                item.imageLink
+                  ? {uri: item.imageLink}
+                  : require('../../assets/picture/universal/R.png')
+              }
               style={{
                 height: height * 0.15,
                 width: width * 0.24,
@@ -307,11 +305,13 @@ const BookDetail = ({navigation, route}) => {
               resizeMode="contain"
             />
             <Text
+              numberOfLines={2}
               style={{
                 color: '#D2CEDC',
-                fontSize: 14,
+                fontSize: 12,
                 fontFamily: 'Poppins-Regular',
-                width: width * 0.24,
+                // width: width * 0.24,
+                marginTop: 3,
               }}>
               {item.title}
             </Text>
@@ -649,7 +649,7 @@ const BookDetail = ({navigation, route}) => {
             </Text>
           </View>
 
-          <SimilarStories />
+          <SimilarStories data={bookRecommendation} />
         </View>
       </ScrollView>
     </SafeAreaView>
