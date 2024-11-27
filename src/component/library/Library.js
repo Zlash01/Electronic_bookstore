@@ -1,11 +1,19 @@
-import {View, Text, Dimensions, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  Dimensions,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {TabView, TabBar} from 'react-native-tab-view';
 import {useNavigation} from '@react-navigation/native';
 import BookCard from './BookCard';
+import {RefreshControl} from 'react-native';
 
 //svg
 import Box from '../../assets/svg/library/box.svg';
+import {getUserLibrary, getUserReadingList} from '../../api/apiController';
 
 const HomeNavTouchable = () => {
   const navigation = useNavigation();
@@ -35,7 +43,7 @@ const HomeNavTouchable = () => {
   );
 };
 
-const LibraryView = ({books}) => {
+const LibraryView = ({books, onRefresh, refreshing}) => {
   if (!books || books.length === 0)
     return (
       <View style={{flex: 1, backgroundColor: '#00171F', alignItems: 'center'}}>
@@ -56,27 +64,35 @@ const LibraryView = ({books}) => {
     );
 
   return (
-    <View
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
       style={{
         flex: 1,
         backgroundColor: '#00171F',
-        padding: 15,
       }}>
       <View
         style={{
           flexDirection: 'row',
           flexWrap: 'wrap',
           justifyContent: 'space-between',
+          padding: 15,
         }}>
         {books.map(book => (
-          <BookCard key={book._id} book={book} isArchive={false} />
+          <BookCard
+            key={book._id}
+            book={book}
+            isArchive={false}
+            onBookUpdate={onRefresh}
+          />
         ))}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
-const Archive = ({books}) => {
+const Archive = ({books, onRefresh, refreshing}) => {
   if (!books || books.length === 0)
     return (
       <View style={{flex: 1, backgroundColor: '#00171F', alignItems: 'center'}}>
@@ -107,27 +123,36 @@ const Archive = ({books}) => {
     );
 
   return (
-    <View
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
       style={{
         flex: 1,
         backgroundColor: '#00171F',
-        padding: 15,
       }}>
       <View
         style={{
           flexDirection: 'row',
           flexWrap: 'wrap',
           justifyContent: 'space-between',
+          padding: 15,
         }}>
         {books.map(book => (
-          <BookCard key={book._id} book={book} isArchive={true} />
+          <BookCard
+            key={book._id}
+            book={book}
+            isArchive={true}
+            onBookUpdate={onRefresh}
+          />
         ))}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
-const Library = () => {
+const Library = ({navigation, route}) => {
+  const [refreshing, setRefreshing] = useState(false);
   const [dataLibrary, setDataLibrary] = useState([]);
   const [dataArchive, setDataArchive] = useState([]);
   const [index, setIndex] = useState(0);
@@ -136,33 +161,50 @@ const Library = () => {
     {key: 'archive', title: 'Archive'},
   ]);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const [libraryRes, archiveRes] = await Promise.all([
-  //         fetch('https://yourapi.com/library'),
-  //         fetch('https://yourapi.com/archive'),
-  //       ]);
+  const fetchLibrary = async () => {
+    setRefreshing(true);
+    try {
+      const [libraryRes, archiveRes] = await Promise.all([
+        getUserLibrary(),
+        getUserReadingList(),
+      ]);
 
-  //       const libraryData = await libraryRes.json();
-  //       const archiveData = await archiveRes.json();
+      if (libraryRes.status === 200) {
+        setDataLibrary(libraryRes.data.library);
+      }
 
-  //       setDataLibrary(libraryData);
-  //       setDataArchive(archiveData);
-  //     } catch (error) {
-  //       console.error('Error fetching data:', error);
-  //     }
-  //   };
+      if (archiveRes.status === 200) {
+        setDataArchive(archiveRes.data.readingList);
+      }
+    } catch (error) {
+      console.error('Error fetching library data:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
-  //   fetchData();
-  // }, []);
+  useEffect(() => {
+    fetchLibrary();
+  }, [index]);
 
   const renderScene = ({route}) => {
     switch (route.key) {
       case 'library':
-        return <LibraryView books={dataLibrary} />;
+        return (
+          <LibraryView
+            books={dataLibrary}
+            onRefresh={fetchLibrary}
+            refreshing={refreshing}
+          />
+        );
       case 'archive':
-        return <Archive books={dataArchive} />;
+        return (
+          <Archive
+            books={dataArchive}
+            onRefresh={fetchLibrary}
+            refreshing={refreshing}
+          />
+        );
       default:
         return null;
     }

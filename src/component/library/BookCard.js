@@ -10,10 +10,11 @@ import {
 } from 'react-native';
 import React, {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
+import {addToLibrary, addToReadingList} from '../../api/apiController';
 
 const {width} = Dimensions.get('window');
 
-const BookCard = ({book, isArchive}) => {
+const BookCard = ({book, isArchive, onBookUpdate}) => {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -28,20 +29,48 @@ const BookCard = ({book, isArchive}) => {
     });
   };
 
-  const handleArchive = () => {
-    console.log(
-      isArchive ? 'Moving to current read' : 'Adding to archive',
-      book._id,
-    );
-    setModalVisible(false);
+  const handleArchive = async () => {
+    try {
+      let res;
+      if (isArchive) {
+        res = await addToLibrary(book._id);
+      } else {
+        res = await addToReadingList(book._id);
+      }
+
+      if (res.status === 200) {
+        Alert.alert(
+          'Success',
+          isArchive ? 'Book moved to Library' : 'Book added to Archive',
+        );
+        setModalVisible(false);
+        // Add small delay to ensure the API update is complete
+        setTimeout(() => {
+          onBookUpdate();
+        }, 500);
+      } else {
+        Alert.alert(
+          'Error',
+          isArchive
+            ? 'Failed to move book to Library'
+            : 'Failed to add book to Archive',
+        );
+      }
+    } catch (error) {
+      console.error('Error moving book:', error);
+      Alert.alert('Error', 'An error occurred while moving the book');
+    }
   };
 
   const handleRemove = () => {
+    // Implement your remove API call here
     console.log(
       'Removing from',
       isArchive ? 'archive' : 'current read',
       book._id,
     );
+    // After successful removal:
+    onBookUpdate(); // Trigger refresh after successful removal
     setModalVisible(false);
   };
 
@@ -55,7 +84,11 @@ const BookCard = ({book, isArchive}) => {
           marginBottom: 20,
         }}>
         <Image
-          source={{uri: book.coverImage}}
+          source={
+            book.coverImage
+              ? {uri: book.coverImage}
+              : require('../../assets/picture/universal/R.png')
+          }
           style={{
             width: '100%',
             height: 180,
@@ -104,7 +137,7 @@ const BookCard = ({book, isArchive}) => {
                 borderBottomColor: '#323232',
               }}>
               <Text style={{color: '#F8F8F8', fontSize: 16}}>
-                {isArchive ? 'Move to Current Read' : 'Add to Archive'}
+                {isArchive ? 'Move to Library' : 'Move to Archive'}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -113,7 +146,7 @@ const BookCard = ({book, isArchive}) => {
                 paddingVertical: 15,
               }}>
               <Text style={{color: '#D24E37', fontSize: 16}}>
-                Remove from {isArchive ? 'Archive' : 'Current Read'}
+                Remove from {isArchive ? 'Archive' : 'Library'}
               </Text>
             </TouchableOpacity>
           </View>

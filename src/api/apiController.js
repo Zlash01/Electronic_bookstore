@@ -650,6 +650,36 @@ export const addToLibrary = async bookId => {
   }
 };
 
+export const addToReadingList = async bookId => {
+  const accessToken = await getAccessToken();
+  try {
+    const response = await axios.put(
+      `http://${IP}/api/book/addToReadingList/${bookId}`,
+      {},
+      {
+        // Configuration object
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        timeout: 5000,
+      },
+    );
+    return {status: response.status, data: response.data};
+  } catch (error) {
+    if (error.response) {
+      console.error('Server error:', error.response.status);
+    } else if (error.request) {
+      console.error(
+        'No response received, server may be down or unreachable:',
+        error.request,
+      );
+    } else {
+      console.error('Error:', error.message);
+    }
+    throw error;
+  }
+};
+
 export const createReview = async (bookId, positive, review) => {
   const accessToken = await getAccessToken();
   try {
@@ -767,21 +797,85 @@ export const getBookReviews = async bookId => {
   }
 };
 
-export const getLibrary = async () => {
+export const getUserLibrary = async (page, limit) => {
   const accessToken = await getAccessToken();
   try {
-    const response = await axios.get(`http://${IP}/api/user/getLibrary`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
+    const response = await axios.get(
+      `http://${IP}/api/book/getUserLibrary?page=${page}&limit=${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        timeout: 5000,
       },
-      timeout: 5000,
-    });
+    );
     return {status: response.status, data: response.data};
   } catch (error) {
     if (error.response && error.response.status === 404) {
       console.warn('No books found');
       return {status: 404, data: null}; // return specific response for 404
     } else if (error.response) {
+      console.error('Server error:', error.response.status);
+      console.log('Error:', error.response.data);
+    } else if (error.request) {
+      console.error(
+        'No response received, server may be down or unreachable:',
+        error.request,
+      );
+    } else {
+      console.error('Error:', error.message);
+    }
+    throw error;
+  }
+};
+
+export const getUserReadingList = async (page, limit) => {
+  const accessToken = await getAccessToken();
+  try {
+    const response = await axios.get(
+      `http://${IP}/api/book/getUserReadingList?page=${page}&limit=${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        timeout: 5000,
+      },
+    );
+    return {status: response.status, data: response.data};
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      console.warn('No books found');
+      return {status: 404, data: null}; // return specific response for 404
+    } else if (error.response) {
+      console.error('Server error:', error.response.status);
+      console.log('Error:', error.response.data);
+    } else if (error.request) {
+      console.error(
+        'No response received, server may be down or unreachable:',
+        error.request,
+      );
+    } else {
+      console.error('Error:', error.message);
+    }
+    throw error;
+  }
+};
+
+export const deleteChapter = async chapterId => {
+  const accessToken = await getAccessToken();
+  try {
+    const response = await axios.delete(
+      `http://${IP}/api/chapter/deleteChapter/${chapterId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        timeout: 5000,
+      },
+    );
+    return {status: response.status, data: response.data};
+  } catch (error) {
+    if (error.response) {
       console.error('Server error:', error.response.status);
       console.log('Error:', error.response.data);
     } else if (error.request) {

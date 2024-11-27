@@ -5,11 +5,15 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  Modal, // Add this
+  Pressable, // Add this
+  Dimensions, // Add this for width
 } from 'react-native';
 import React, {useEffect, useLayoutEffect, useState} from 'react';
 import MoreVert from './../../assets/svg/universal/more_vert.svg';
 import {updateChapter} from '../../api/apiController';
 import ArrowBack from './../../assets/svg/universal/arrow_back.svg';
+import {deleteChapter} from '../../api/apiController';
 
 const CreateChapter = ({navigation, route}) => {
   const [chapterTitle, setChapterTitle] = useState('This is a title');
@@ -18,6 +22,7 @@ const CreateChapter = ({navigation, route}) => {
   const [savedContent, setSavedContent] = useState('This is a content');
   const [hasChanges, setHasChanges] = useState(false);
   const [inputHeight, setInputHeight] = useState(50);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const chapterId = route.params.response._id;
 
@@ -85,7 +90,7 @@ const CreateChapter = ({navigation, route}) => {
                 Save
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={{}}>
+            <TouchableOpacity onPress={() => setModalVisible(true)}>
               <MoreVert height={30} width={30} />
             </TouchableOpacity>
           </View>
@@ -111,6 +116,18 @@ const CreateChapter = ({navigation, route}) => {
       console.error('Error: ', error);
       Alert.alert('Error saving chapter');
     }
+  };
+
+  const handleDelete = () => {
+    deleteChapter(chapterId).then(res => {
+      if (res.status === 200) {
+        Alert.alert('Success', 'Chapter deleted successfully');
+        navigation.navigate('Write');
+      } else {
+        Alert.alert('Error', 'Failed to delete chapter');
+      }
+    });
+    setModalVisible(false);
   };
 
   return (
@@ -167,6 +184,38 @@ const CreateChapter = ({navigation, route}) => {
         />
       </View>
       <View style={{height: 100}} />
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}>
+        <Pressable
+          onPress={() => setModalVisible(false)}
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <View
+            style={{
+              backgroundColor: '#001B24',
+              padding: 20,
+              borderRadius: 8,
+              width: Dimensions.get('window').width * 0.8,
+            }}>
+            <TouchableOpacity
+              onPress={handleDelete}
+              style={{
+                paddingVertical: 15,
+              }}>
+              <Text style={{color: '#D24E37', fontSize: 16}}>
+                Delete Chapter
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </Pressable>
+      </Modal>
     </ScrollView>
   );
 };
