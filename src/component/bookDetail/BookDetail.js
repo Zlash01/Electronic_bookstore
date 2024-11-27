@@ -6,6 +6,7 @@ import {
   ScrollView,
   FlatList,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -27,6 +28,7 @@ import {
   getRandomBooks,
   getSingleBookData,
 } from '../../api/apiController';
+import {Check, Library} from 'lucide-react-native';
 import Loading from '../loading/loading';
 
 const height = Dimensions.get('window').height;
@@ -39,6 +41,13 @@ const BookDetail = ({navigation, route}) => {
   const [bookRecommendation, setBookRecommendation] = useState({});
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isInLibrary, setIsInLibrary] = useState(false);
+  const [isArchive, setIsArchive] = useState(false);
+
+  useEffect(() => {
+    setIsInLibrary(bookData.inLibrary);
+    setIsArchive(bookData.inReadingList);
+  }, [bookData]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,39 +110,36 @@ const BookDetail = ({navigation, route}) => {
     fetchData();
   }, [idBooks]);
 
-  useEffect(() => {
-    console.log('Reviews:', reviews);
-  }, [reviews]);
-
   //functions
   const rcmPercentage = (totalVoteRecommended, totalVote) => {
     return totalVote > 0 ? (totalVoteRecommended / totalVote) * 100 : 0;
   };
 
-  const [added, setAdded] = React.useState(false);
   const [libLoading, setLibLoading] = React.useState(false);
 
   const addToLibraryFunc = async () => {
     setLibLoading(true);
     console.log('Adding book to library:', idBooks);
-    await addToLibrary(idBooks)
-      .then(res => {
-        if (res.status === 200) {
-          console.log('Success:', res);
-          setAdded(true);
-        } else {
-          console.log('Error:', res);
-          Alert.alert('Error', 'Failed to add book to library', res.data);
-        }
-      })
-      .catch(error => {
-        console.log('Error:', error);
-        Alert.alert('Error', 'An unexpected error occurred');
-      })
-      .finally(() => {
-        setAdded(!added);
-        setLibLoading(false);
-      });
+    try {
+      const res = await addToLibrary(idBooks);
+      if (res.status === 200) {
+        console.log('Success:', res);
+        // Update both states
+        setIsInLibrary(true);
+        setBookData(prevData => ({
+          ...prevData,
+          inLibrary: true,
+        }));
+      } else {
+        console.log('Error:', res);
+        Alert.alert('Error', 'Failed to add book to library', res.data);
+      }
+    } catch (error) {
+      console.log('Error:', error);
+      Alert.alert('Error', 'An unexpected error occurred');
+    } finally {
+      setLibLoading(false);
+    }
   };
 
   const tagsParser = tags => {
@@ -466,7 +472,8 @@ const BookDetail = ({navigation, route}) => {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={addToLibraryFunc}
+            onPress={!isInLibrary && !isArchive ? addToLibraryFunc : null}
+            disabled={isInLibrary || isArchive || libLoading}
             style={{
               flexDirection: 'row',
               justifyContent: 'center',
@@ -475,20 +482,30 @@ const BookDetail = ({navigation, route}) => {
               height: 40,
               marginTop: 15,
               flex: 9,
-              // backgroundColor: 'red',
               borderWidth: 2,
-              borderColor: '#F8F8F8',
+              borderColor: isInLibrary || isArchive ? '#606060' : '#F8F8F8',
               borderRadius: 90,
+              opacity: isInLibrary || isArchive ? 0.7 : 1,
             }}>
-            <LibAdd style={{height: 24, width: 24}} />
+            {libLoading ? (
+              <ActivityIndicator size="small" color="#D2CEDC" />
+            ) : isInLibrary || isArchive ? (
+              <Check style={{height: 24, width: 24, color: '#606060'}} />
+            ) : (
+              <LibAdd style={{height: 24, width: 24}} />
+            )}
             <Text
               style={{
-                color: '#D2CEDC',
+                color: isInLibrary ? '#606060' : '#D2CEDC',
                 fontSize: 16,
                 fontFamily: 'Poppins-Regular',
                 textAlign: 'center',
               }}>
-              Library
+              {isInLibrary
+                ? 'In Library'
+                : isArchive
+                ? 'In Archive'
+                : 'Library'}
             </Text>
           </TouchableOpacity>
         </View>

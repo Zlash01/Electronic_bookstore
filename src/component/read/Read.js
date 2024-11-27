@@ -6,7 +6,7 @@ import {
   Dimensions,
   StyleSheet,
 } from 'react-native';
-import React, {useLayoutEffect, useState, useRef, useEffect} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {ArrowLeft, Type, Palette, Settings, Star} from 'lucide-react-native';
 import FontSettingsModal from './Util/FontSetting';
 import ThemeSettingsModal from './Util/ThemeSetting';
@@ -17,12 +17,15 @@ import {increaseViewCount} from '../../api/apiController';
 
 const {width, height} = Dimensions.get('window');
 
-const TopBar = ({title, onBack}) => (
-  <View style={styles.topBar}>
+const TopBar = ({title, onBack, currentTheme}) => (
+  <View
+    style={[styles.topBar, {backgroundColor: currentTheme.backgroundColor}]}>
     <TouchableOpacity onPress={onBack} style={styles.backButton}>
-      <ArrowLeft color="#f8f8f8" size={24} />
+      <ArrowLeft color={currentTheme.fontColor} size={24} />
     </TouchableOpacity>
-    <Text style={styles.topBarTitle} numberOfLines={1}>
+    <Text
+      style={[styles.topBarTitle, {color: currentTheme.fontColor}]}
+      numberOfLines={1}>
       {title}
     </Text>
     <View style={styles.placeholderWidth} />
@@ -36,18 +39,17 @@ const BottomBar = ({
   onThemePress,
   onReviewPress,
   hasReview,
+  theme,
 }) => (
-  <View style={styles.bottomBar}>
-    {/* Seekbar */}
+  <View
+    style={[
+      styles.bottomBar,
+      {backgroundColor: theme.backgroundColor}, // Add this line
+    ]}>
     <View style={styles.seekbarContainer}>
       <View style={[styles.seekbarProgress, {width: `${scrollPercentage}%`}]} />
-      {/* <TouchableOpacity
-        style={[styles.seekbarHandle, {left: `${scrollPercentage}%`}]}
-        onPress={onSeek}
-      /> */}
     </View>
 
-    {/* Bottom icons */}
     <View style={styles.bottomIcons}>
       <TouchableOpacity
         onPress={onReviewPress}
@@ -56,19 +58,19 @@ const BottomBar = ({
         {hasReview ? (
           <Star stroke="#EB5E28" fill={'#EB5E28'} size={24} />
         ) : (
-          <Star stroke="#f8f8f8" size={24} />
+          <Star stroke={theme.fontColor} size={24} />
         )}
       </TouchableOpacity>
       <TouchableOpacity onPress={onFontPress} style={styles.iconButton}>
-        <Type stroke="#f8f8f8" size={24} />
+        <Type stroke={theme.fontColor} size={24} />
       </TouchableOpacity>
       <TouchableOpacity onPress={onThemePress} style={styles.iconButton}>
-        <Palette stroke="#f8f8f8" size={24} />
+        <Palette stroke={theme.fontColor} size={24} />
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => console.log('Settings')}
         style={styles.iconButton}>
-        <Settings stroke="#f8f8f8" size={24} />
+        <Settings stroke={theme.fontColor} size={24} />
       </TouchableOpacity>
     </View>
   </View>
@@ -216,6 +218,7 @@ const Read = ({navigation, route}) => {
       <TopBar
         title={route.params.bookTitle}
         onBack={() => navigation.goBack()}
+        currentTheme={currentTheme}
       />
 
       <ScrollView
@@ -258,6 +261,7 @@ const Read = ({navigation, route}) => {
         onThemePress={() => setThemeSettingsVisible(true)}
         onReviewPress={() => setReviewSettingsVisible(true)}
         hasReview={hasReview}
+        theme={currentTheme}
       />
       <FontSettingsModal
         visible={fontSettingsVisible}
@@ -291,7 +295,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 8,
-    backgroundColor: '#001219',
     borderBottomWidth: 1,
     borderBottomColor: '#323232',
   },
@@ -301,14 +304,12 @@ const styles = StyleSheet.create({
   topBarTitle: {
     flex: 1,
     fontSize: 18,
-    color: '#f8f8f8',
     fontFamily: 'Poppins-Medium',
   },
   placeholderWidth: {
     width: 32,
   },
   bottomBar: {
-    backgroundColor: '#001219',
     borderTopWidth: 1,
     borderTopColor: '#323232',
     paddingBottom: 24,

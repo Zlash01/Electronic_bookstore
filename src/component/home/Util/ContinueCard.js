@@ -11,14 +11,18 @@ import {
 } from 'react-native';
 import * as themes from '../../../theme/theme';
 import * as Progress from 'react-native-progress';
+import {useNavigation} from '@react-navigation/native';
 
 const {width, height} = Dimensions.get('window');
 
 const ITEM_SIZE = width * 0.32;
 
 const ContinueCard = props => {
+  const navigation = useNavigation();
   const handlePress = () => {
-    console.log('Selected book:', title);
+    navigation.navigate('Detail', {
+      idBooks: props.idBooks,
+    });
   };
 
   return (
@@ -29,7 +33,7 @@ const ContinueCard = props => {
         gap: 10,
         flexDirection: 'column',
       }}>
-      <TouchableOpacity style={{height: ITEM_SIZE * 1.5}}>
+      <TouchableOpacity style={{height: ITEM_SIZE * 1.5}} onPress={handlePress}>
         <Image
           source={
             props.imageLink

@@ -11,8 +11,6 @@ const Setting = ({navigation}) => {
   const handleLogout = async () => {
     await AsyncStorage.removeItem('refreshToken');
     logout();
-    // Assuming navigation to Login screen after logout
-    navigation.navigate('Login');
   };
 
   return (

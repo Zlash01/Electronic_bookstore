@@ -5,6 +5,22 @@ import {Alert} from 'react-native';
 
 const IP = '26.62.31.221:3000';
 
+const getAccessToken = async () => {
+  const {accessToken} = useAuthStore.getState();
+  console.log('Access token:', accessToken);
+  if (!accessToken) {
+    const {logout} = useAuthStore.getState();
+    console.error('Access token is null');
+    Alert.alert(
+      'Invalid session, please log in again, error msg: Access token is null',
+    );
+    AsyncStorage.removeItem('refreshToken');
+    logout();
+    return;
+  }
+  return accessToken;
+};
+
 export const loginRequest = async (username, password) => {
   try {
     const response = await axios.post(
@@ -99,15 +115,7 @@ export const refreshRequest = async refreshToken => {
 };
 
 export const getTrendingBooks = async (page, limit) => {
-  const {accessToken} = useAuthStore.getState();
-  console.log('Access token:', accessToken);
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.get(
       `http://${IP}/api/book/getAllTrendingBooks?page=${page}&limit=${limit}`,
@@ -138,18 +146,7 @@ export const getTrendingBooks = async (page, limit) => {
 };
 
 export const createBook = async (title, description, coverImageLink) => {
-  const {accessToken} = useAuthStore.getState();
-  console.log('Access token:', accessToken);
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    Alert.alert(
-      'Invalid session, please log in again, error msg: Access token is null',
-    );
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.post(
       `http://${IP}/api/book/createBook`,
@@ -186,17 +183,7 @@ export const createBook = async (title, description, coverImageLink) => {
 };
 
 export const createChapter = async bookId => {
-  const {accessToken} = useAuthStore.getState();
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    Alert.alert(
-      'Invalid session, please log in again, error msg: Access token is null',
-    );
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.post(
       `http://${IP}/api/chapter/createChapter/${bookId}`,
@@ -229,18 +216,7 @@ export const createChapter = async bookId => {
 };
 
 export const updateChapter = async (chapterId, title, content) => {
-  console.log('Updating chapter:', chapterId, title, content);
-  const {accessToken} = useAuthStore.getState();
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    Alert.alert(
-      'Invalid session, please log in again, error msg: Access token is null',
-    );
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.put(
       `http://${IP}/api/chapter/updateChapter/${chapterId}`,
@@ -276,17 +252,7 @@ export const updateChapter = async (chapterId, title, content) => {
 };
 
 export const getAllUserBooks = async () => {
-  const {accessToken} = useAuthStore.getState();
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    Alert.alert(
-      'Invalid session, please log in again, error msg: Access token is null',
-    );
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.get(`http://${IP}/api/book/getAllUserBooks`, {
       headers: {
@@ -315,17 +281,7 @@ export const getAllUserBooks = async () => {
 };
 
 export const getAllUserPublishedBooks = async () => {
-  const {accessToken} = useAuthStore.getState();
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    Alert.alert(
-      'Invalid session, please log in again, error msg: Access token is null',
-    );
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   console.log('Access token:', accessToken);
   try {
     const response = await axios.get(
@@ -358,17 +314,7 @@ export const getAllUserPublishedBooks = async () => {
 };
 
 export const getAllUserDraftBooks = async () => {
-  const {accessToken} = useAuthStore.getState();
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    Alert.alert(
-      'Invalid session, please log in again, error msg: Access token is null',
-    );
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   console.log('Access token:', accessToken);
   try {
     const response = await axios.get(
@@ -401,17 +347,7 @@ export const getAllUserDraftBooks = async () => {
 };
 
 export const getSingleBookData = async bookId => {
-  const {accessToken} = useAuthStore.getState();
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    Alert.alert(
-      'Invalid session, please log in again, error msg: Access token is null',
-    );
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.get(
       `http://${IP}/api/book/getSingleBook/${bookId}`,
@@ -446,17 +382,7 @@ export const updateBook = async (
   coverImageLink,
   tags,
 ) => {
-  const {accessToken} = useAuthStore.getState();
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    Alert.alert(
-      'Invalid session, please log in again, error msg: Access token is null',
-    );
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.put(
       `http://${IP}/api/book/updateBook/${bookId}`,
@@ -491,17 +417,7 @@ export const updateBook = async (
 };
 
 export const publishBook = async bookId => {
-  const {accessToken} = useAuthStore.getState();
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    Alert.alert(
-      'Invalid session, please log in again, error msg: Access token is null',
-    );
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.put(
       `http://${IP}/api/book/publishBook/${bookId}`,
@@ -531,17 +447,7 @@ export const publishBook = async bookId => {
 };
 
 export const unpublishBook = async bookId => {
-  const {accessToken} = useAuthStore.getState();
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    Alert.alert(
-      'Invalid session, please log in again, error msg: Access token is null',
-    );
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.put(
       `http://${IP}/api/book/unpublishBook/${bookId}`,
@@ -571,17 +477,7 @@ export const unpublishBook = async bookId => {
 };
 
 export const deleteBook = async bookId => {
-  const {accessToken} = useAuthStore.getState();
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    Alert.alert(
-      'Invalid session, please log in again, error msg: Access token is null',
-    );
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.delete(
       `http://${IP}/api/book/deleteBook/${bookId}`,
@@ -610,17 +506,7 @@ export const deleteBook = async bookId => {
 };
 
 export const getSingleChapter = async chapterId => {
-  const {accessToken} = useAuthStore.getState();
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    Alert.alert(
-      'Invalid session, please log in again, error msg: Access token is null',
-    );
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.get(
       `http://${IP}/api/chapter/getSingleChapter/${chapterId}`,
@@ -649,15 +535,7 @@ export const getSingleChapter = async chapterId => {
 };
 
 export const searchBooks = async (query = '', tag = '', page, limit) => {
-  const {accessToken} = useAuthStore.getState();
-  console.log('Access token:', accessToken);
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.get(
       `http://${IP}/api/book/getAllBooks?keyword=${query}&tag=${tag}&page=${page}&limit=${limit}`,
@@ -686,17 +564,7 @@ export const searchBooks = async (query = '', tag = '', page, limit) => {
 };
 
 export const searchBooksByTag = async (tag, page = 1, limit = 10) => {
-  const {accessToken} = useAuthStore.getState();
-  console.log('Access token:', accessToken);
-
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
-
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.get(
       `http://${IP}/api/book/getAllBooks?keyword=&tags=${tag}&page=${page}&limit=${limit}`,
@@ -725,15 +593,7 @@ export const searchBooksByTag = async (tag, page = 1, limit = 10) => {
 };
 
 export const getRandomBooks = async (page, limit) => {
-  const {accessToken} = useAuthStore.getState();
-  console.log('Access token:', accessToken);
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.get(
       `http://${IP}/api/book/getRandomBooks?page=${page}&limit=${limit}`,
@@ -761,15 +621,7 @@ export const getRandomBooks = async (page, limit) => {
 };
 
 export const addToLibrary = async bookId => {
-  const {accessToken} = useAuthStore.getState();
-  console.log('Access token:', accessToken);
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.put(
       `http://${IP}/api/book/addToLibrary/${bookId}`,
@@ -799,15 +651,7 @@ export const addToLibrary = async bookId => {
 };
 
 export const createReview = async (bookId, positive, review) => {
-  const {accessToken} = useAuthStore.getState();
-  console.log('Access token:', accessToken);
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.post(
       `http://${IP}/api/review/createReview/`,
@@ -840,15 +684,7 @@ export const createReview = async (bookId, positive, review) => {
 };
 
 export const hasReviewed = async bookId => {
-  const {accessToken} = useAuthStore.getState();
-  console.log('Access token:', accessToken);
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.get(
       `http://${IP}/api/user/${bookId}/hasReview`,
@@ -876,15 +712,7 @@ export const hasReviewed = async bookId => {
 };
 
 export const increaseViewCount = async bookId => {
-  const {accessToken} = useAuthStore.getState();
-  console.log('Access token:', accessToken);
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.put(
       `http://${IP}/api/book/increaseView/${bookId}`,
@@ -912,15 +740,7 @@ export const increaseViewCount = async bookId => {
 };
 
 export const getBookReviews = async bookId => {
-  const {accessToken} = useAuthStore.getState();
-  console.log('Access token:', accessToken);
-  if (!accessToken) {
-    const {logout} = useAuthStore.getState();
-    console.error('Access token is null');
-    AsyncStorage.removeItem('refreshToken');
-    logout();
-    return;
-  }
+  const accessToken = await getAccessToken();
   try {
     const response = await axios.get(
       `http://${IP}/api/review/getBookReviews/${bookId}`,
@@ -935,6 +755,35 @@ export const getBookReviews = async bookId => {
   } catch (error) {
     if (error.response) {
       console.error('Server error:', error.response.status);
+    } else if (error.request) {
+      console.error(
+        'No response received, server may be down or unreachable:',
+        error.request,
+      );
+    } else {
+      console.error('Error:', error.message);
+    }
+    throw error;
+  }
+};
+
+export const getLibrary = async () => {
+  const accessToken = await getAccessToken();
+  try {
+    const response = await axios.get(`http://${IP}/api/user/getLibrary`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      timeout: 5000,
+    });
+    return {status: response.status, data: response.data};
+  } catch (error) {
+    if (error.response && error.response.status === 404) {
+      console.warn('No books found');
+      return {status: 404, data: null}; // return specific response for 404
+    } else if (error.response) {
+      console.error('Server error:', error.response.status);
+      console.log('Error:', error.response.data);
     } else if (error.request) {
       console.error(
         'No response received, server may be down or unreachable:',
