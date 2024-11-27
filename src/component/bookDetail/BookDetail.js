@@ -158,6 +158,7 @@ const BookDetail = ({navigation, route}) => {
           bookId={part.book}
           chapterDate={new Date(part.createdAt).toLocaleDateString()}
           chapterNumber={part.chapterNumber}
+          chapterList={bookData.chapters}
         />
       ));
   };
@@ -385,10 +386,6 @@ const BookDetail = ({navigation, route}) => {
             alignItems: 'center',
             gap: 10,
           }}>
-          {/* <Image
-            source={{uri: bookDetail.authorImage}}
-            style={{height: 32, width: 32, borderRadius: 1000}}
-          /> */}
           <Text
             style={{
               color: '#D2CEDC',
@@ -442,6 +439,7 @@ const BookDetail = ({navigation, route}) => {
                 bookTitle: bookData.title,
                 chapterNumber: 1,
                 bookId: idBooks,
+                chapterList: bookData.chapters,
               })
             }
             style={{

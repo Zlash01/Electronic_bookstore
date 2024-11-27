@@ -11,6 +11,7 @@ const IndividualChapter = props => {
       booktitle: props.chapterTitle,
       chapterNumber: props.chapterNumber,
       bookId: props.bookId,
+      chapterList: props.chapterList,
     });
   };
   return (

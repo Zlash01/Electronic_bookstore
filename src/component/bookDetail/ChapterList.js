@@ -23,6 +23,7 @@ const ChapterList = ({navigation, route}) => {
           bookId={part.book}
           chapterDate={new Date(part.createdAt).toLocaleDateString()}
           chapterNumber={part.chapterNumber}
+          chapterList={route.params.data}
         />
       ))
     );

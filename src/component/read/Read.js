@@ -11,9 +11,11 @@ import {ArrowLeft, Type, Palette, Settings, Star} from 'lucide-react-native';
 import FontSettingsModal from './Util/FontSetting';
 import ThemeSettingsModal from './Util/ThemeSetting';
 import ReviewModal from './Util/Review';
+import {Menu} from 'lucide-react-native';
 import Loading from '../loading/loading';
 import {getSingleChapter, hasReviewed} from '../../api/apiController';
 import {increaseViewCount} from '../../api/apiController';
+import ChapterListModal from './Util/ChapterListModal';
 
 const {width, height} = Dimensions.get('window');
 
@@ -38,6 +40,7 @@ const BottomBar = ({
   onFontPress,
   onThemePress,
   onReviewPress,
+  onChapterListPress,
   hasReview,
   theme,
 }) => (
@@ -68,9 +71,9 @@ const BottomBar = ({
         <Palette stroke={theme.fontColor} size={24} />
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => console.log('Settings')}
+        onPress={() => onChapterListPress()}
         style={styles.iconButton}>
-        <Settings stroke={theme.fontColor} size={24} />
+        <Menu stroke={theme.fontColor} size={24} />
       </TouchableOpacity>
     </View>
   </View>
@@ -103,6 +106,8 @@ const Read = ({navigation, route}) => {
     setReviewSettingsVisible(false);
     setHasReview(true);
   };
+
+  const [chapterListVisible, setChapterListVisible] = useState({});
 
   useEffect(() => {
     let isMounted = true; // For cleanup/prevent memory leaks
@@ -205,6 +210,26 @@ const Read = ({navigation, route}) => {
     }
   };
 
+  const handleChapterSelect = async chapter => {
+    if (chapter._id === route.params.idChapter) return;
+
+    setChapterListVisible(false);
+    setLoading(true);
+    try {
+      const response = await getSingleChapter(chapter._id);
+      setData({
+        title: response.data.title,
+        content: response.data.content,
+      });
+      // Update the route params to reflect the new chapter
+      route.params.idChapter = chapter._id;
+    } catch (err) {
+      console.error('Error fetching chapter:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -260,6 +285,7 @@ const Read = ({navigation, route}) => {
         onFontPress={() => setFontSettingsVisible(true)}
         onThemePress={() => setThemeSettingsVisible(true)}
         onReviewPress={() => setReviewSettingsVisible(true)}
+        onChapterListPress={() => setChapterListVisible(true)}
         hasReview={hasReview}
         theme={currentTheme}
       />
@@ -281,6 +307,14 @@ const Read = ({navigation, route}) => {
         visible={reviewSettingsVisible}
         onClose={() => handleReviewOnClose()}
         bookId={route.params.bookId}
+      />
+      <ChapterListModal
+        visible={chapterListVisible}
+        onClose={() => setChapterListVisible(false)}
+        chapters={route.params.chapterList}
+        currentChapter={route.params.idChapter}
+        onChapterSelect={handleChapterSelect}
+        theme={currentTheme}
       />
     </View>
   );
