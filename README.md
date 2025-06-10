@@ -72,39 +72,11 @@ A modern mobile reading and writing platform built with React Native, allowing u
    ```
 
 ## 📱 Screenshots
-![Login Screen](screenshot\0.png)
-![Main Menu](screenshots\1.png)
-![Reading](screenshots\2.png)
-![Book Detail](screenshots\3.png)
-![Create Book and Chapter](screenshots\4.png)
-
-### Authentication & Home
-<div align="center">
-  <img src="./screenshots/login.png" width="250" alt="Login Screen"/>
-  <img src="./screenshots/register.png" width="250" alt="Register Screen"/>
-  <img src="./screenshots/home.png" width="250" alt="Home Screen"/>
-</div>
-
-### Reading Experience
-<div align="center">
-  <img src="./screenshots/book-detail.png" width="250" alt="Book Detail"/>
-  <img src="./screenshots/reading.png" width="250" alt="Reading Screen"/>
-  <img src="./screenshots/font-settings.png" width="250" alt="Font Settings"/>
-</div>
-
-### Library & Search
-<div align="center">
-  <img src="./screenshots/library.png" width="250" alt="Library"/>
-  <img src="./screenshots/search.png" width="250" alt="Search"/>
-  <img src="./screenshots/search-results.png" width="250" alt="Search Results"/>
-</div>
-
-### Content Creation
-<div align="center">
-  <img src="./screenshots/write-publish.png" width="250" alt="Published Books"/>
-  <img src="./screenshots/create-book.png" width="250" alt="Create Book"/>
-  <img src="./screenshots/chapter-creation.png" width="250" alt="Chapter Creation"/>
-</div>
+![Login Screen](screenshot/0.png)
+![Main Menu](screenshots/1.png)
+![Reading](screenshots/2.png)
+![Book Detail](screenshots/3.png)
+![Create Book and Chapter](screenshots/4.png)
 
 ## 🏗️ Project Structure
 
