@@ -1,79 +1,189 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# 📚 Electronic Bookstore
 
-# Getting Started
+A modern mobile reading and writing platform built with React Native, allowing users to read, discover, and publish digital books.
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## ✨ Features
 
-## Step 1: Start the Metro Server
+### For Readers
+- 📖 **Immersive Reading Experience** - Customizable fonts, themes, and reading settings
+- 📚 **Personal Library** - Organize books with library and archive collections
+- 🔍 **Smart Search** - Find books by keywords, genres, and categories
+- ⭐ **Reviews & Ratings** - Rate and review books from the community
+- 📱 **Cross-platform** - Seamless experience on iOS and Android
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+### For Authors
+- ✍️ **Content Creation** - Write and publish books directly in the app
+- 📊 **Analytics** - Track views, ratings, and reader engagement
+- 🗂️ **Chapter Management** - Organize content with easy chapter navigation
+- 🏷️ **Tagging System** - Categorize books with genre tags
 
-To start Metro, run the following command from the _root_ of your React Native project:
+### General Features
+- 🔐 **Secure Authentication** - JWT-based auth with social login support
+- 🎨 **Customizable Interface** - Dark/light themes and font preferences
+- 💾 **Offline Reading** - Save books for offline access
+- 🔄 **Real-time Sync** - Keep reading progress synchronized
 
-```bash
-# using npm
-npm start
+## 🛠️ Tech Stack
 
-# OR using Yarn
-yarn start
+- **Frontend**: React Native
+- **Navigation**: React Navigation
+- **State Management**: Zustand
+- **Authentication**: JWT + Social OAuth
+- **Storage**: AsyncStorage
+- **Media**: Firebase Storage
+- **API Communication**: Axios
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v14 or higher)
+- React Native CLI
+- iOS Simulator / Android Emulator
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Zlash01/Electronic_bookstore.git
+   cd Electronic_bookstore
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. **Setup environment variables**
+   ```bash
+   # Create .env file and add your configuration
+   API_BASE_URL=your_backend_url
+   FIREBASE_CONFIG=your_firebase_config
+   ```
+
+4. **Run the application**
+   ```bash
+   # For iOS
+   npx react-native run-ios
+   
+   # For Android
+   npx react-native run-android
+   ```
+
+## 📱 Screenshots
+![Login Screen](./screenshots/0.png)
+![Main Menu](./screenshots/1.png)
+![Reading](./screenshots/2.png)
+![Book Detail](./screenshots/3.png)
+![Create Book and Chapter](./screenshots/4.png)
+
+### Authentication & Home
+<div align="center">
+  <img src="./screenshots/login.png" width="250" alt="Login Screen"/>
+  <img src="./screenshots/register.png" width="250" alt="Register Screen"/>
+  <img src="./screenshots/home.png" width="250" alt="Home Screen"/>
+</div>
+
+### Reading Experience
+<div align="center">
+  <img src="./screenshots/book-detail.png" width="250" alt="Book Detail"/>
+  <img src="./screenshots/reading.png" width="250" alt="Reading Screen"/>
+  <img src="./screenshots/font-settings.png" width="250" alt="Font Settings"/>
+</div>
+
+### Library & Search
+<div align="center">
+  <img src="./screenshots/library.png" width="250" alt="Library"/>
+  <img src="./screenshots/search.png" width="250" alt="Search"/>
+  <img src="./screenshots/search-results.png" width="250" alt="Search Results"/>
+</div>
+
+### Content Creation
+<div align="center">
+  <img src="./screenshots/write-publish.png" width="250" alt="Published Books"/>
+  <img src="./screenshots/create-book.png" width="250" alt="Create Book"/>
+  <img src="./screenshots/chapter-creation.png" width="250" alt="Chapter Creation"/>
+</div>
+
+## 🏗️ Project Structure
+
+```
+src/
+├── api/                # API controllers and services
+├── assets/             # Images, fonts, and static resources
+├── components/         # Reusable UI components
+│   ├── auth/          # Authentication components
+│   ├── bookDetail/    # Book detail screens
+│   ├── home/          # Home screen components
+│   ├── library/       # Library management
+│   ├── read/          # Reading interface
+│   ├── search/        # Search functionality
+│   └── write/         # Content creation tools
+├── router/            # Navigation configuration
+├── store/             # State management
+└── util/              # Utility functions and constants
 ```
 
-## Step 2: Start your Application
+## 🌐 Backend
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+This app works with a NestJS backend. Check out the backend repository:
+- **Backend Repository**: [BE-Reading-App-Mobile](https://github.com/nkd0210/BE-Reading-App-Mobile)
+- **API Documentation**: Available at backend deployment
+- **Deployment**: Hosted on Render
 
-### For Android
+## 🔧 Architecture
 
-```bash
-# using npm
-npm run android
+### Frontend Architecture
+- **Client-Server**: React Native app communicating with NestJS backend
+- **State Management**: Zustand for global state
+- **Authentication**: JWT tokens with refresh mechanism
+- **Data Flow**: RESTful API calls with axios interceptors
 
-# OR using Yarn
-yarn android
-```
+### Key Features Implementation
+- **Reading Interface**: Customizable font sizes, themes, and reading modes
+- **Library Management**: Personal collections with archive functionality
+- **Content Creation**: Rich text editor for authors
+- **Search System**: Multi-parameter search with category filtering
 
-### For iOS
+## 🧪 Testing
 
-```bash
-# using npm
-npm run ios
+The app has been tested for:
+- ✅ User authentication flows
+- ✅ Book navigation and reading experience
+- ✅ Library management operations
+- ✅ Search functionality
+- ✅ Content creation and publishing
+- ✅ Cross-platform compatibility
 
-# OR using Yarn
-yarn ios
-```
+## 🤝 Contributing
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+## 🔮 Future Enhancements
 
-## Step 3: Modifying your App
+### Planned Features
+- 🔄 **Multi-device Sync** - Synchronize reading progress across devices
+- 📱 **Offline Mode** - Enhanced offline reading capabilities
+- 💬 **Community Features** - Discussion forums and book clubs
+- 🤖 **AI Recommendations** - Smart book suggestion system
+- 📊 **Advanced Analytics** - Detailed insights for authors
 
-Now that you have successfully run the app, let's modify it.
+### Technical Improvements
+- Performance optimizations for large libraries
+- Enhanced caching strategies
+- Server-side rendering for web version
+- End-to-end encryption for sensitive data
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+---
 
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+<div align="center">
+  <strong>Built with ❤️ using React Native</strong>
+  <br>
+  <sub>Electronic Bookstore - Your Digital Reading Companion</sub>
+</div>
