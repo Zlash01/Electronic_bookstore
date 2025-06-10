@@ -73,10 +73,10 @@ A modern mobile reading and writing platform built with React Native, allowing u
 
 ## 📱 Screenshots
 ![Login Screen](screenshot/0.png)
-![Main Menu](screenshots/1.png)
-![Reading](screenshots/2.png)
-![Book Detail](screenshots/3.png)
-![Create Book and Chapter](screenshots/4.png)
+![Main Menu](screenshot/1.png)
+![Reading](screenshot/2.png)
+![Book Detail](screenshot/3.png)
+![Create Book and Chapter](screenshot/4.png)
 
 ## 🏗️ Project Structure
 
